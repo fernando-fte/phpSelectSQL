@@ -33,13 +33,13 @@ $post['select']['type'] = 'chamada';
 $temp['select']['table'] = $post['table'];
 
 # adiciona em @temp>select>where os campos de redundanca de seleção
-$temp['select']['where'] = $post['where'];
+$temp['select']['where'] = $post['select'];
 
 # trata os parametros para chamada do banco
 # # #
 
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
-$temp['resposta'] = select($temp['select'], true);
+$temp['resposta'] = select($temp['select'], false);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -70,7 +70,7 @@ function select($post, $print){
     $post['type'] = 'select';
 
     # adiciona em @temp>valida o valor recebido da função trata_query
-    $temp['valida'] = trata_query($post, false);
+    $temp['valida'] = trata_query($post, true);
 
     # verifica se houve algum problema no tratamento, com @temp>valida>successs sendo falso
     if ($temp['valida']['success'] == false) {
@@ -119,19 +119,19 @@ function select($post, $print){
     if ($return['success'] == true) {
 
         # para enviar ao query deve ficar desta forma
-/*
-$Sel = mysql_query(
-    "SELECT `segmento`, `index`
-    FROM `tabela` 
-    WHERE `segmento` LIKE 'caso clinico' 
-    AND `grupo` LIKE '1' 
-    AND `type` LIKE 'image'
-    ORDER BY `index` DESC
-    LIMIT 3
-") or die(mysql_error());
-*/
+        /*
+        $Sel = mysql_query(
+            "SELECT `segmento`, `index`
+            FROM `tabela` 
+            WHERE `segmento` LIKE 'caso clinico' 
+            AND `grupo` LIKE '1' 
+            AND `type` LIKE 'image'
+            ORDER BY `index` DESC
+            LIMIT 3
+        ") or die(mysql_error());
+        */
 
-        
+                
 
 
     }
@@ -377,6 +377,63 @@ function trata_query($post, $print){
                 # adiciona +1 em $return>error>length
                 $return['warning']['length']++;
             }
+
+            # valida se existe @post>return, contem a lista de campos a serem retornados
+            if (array_key_exists('return', $post)) {
+
+                # valida se não existe array em @post>return
+                if (!is_array($post['return'])) {
+
+                    # valida se o conteudo de @post>return não é vazio
+                    if ($post['return'] != '') {
+
+                        # define array em @post>return na posição zero contendo @post>return
+                        $post['return'] = array($post['return']);
+
+                        # adiciona em @post>return>length o valor 1, referente a quantia de valores na posição
+                        $post['return']['length']++;
+
+
+                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi definido nem um campo array para a seleção do banco, desta forma por padrão foi declarado na posição zero a string repassada';
+
+                        # adiciona +1 em $return>error>length
+                        $return['warning']['length'] = 1;
+                    }
+
+                    # valida se o conteudo de @post>return é vazio
+                    if ($post['return'] == '') {
+
+                        # adiciona em @return>error>[@~length]>type o um relato do que houve
+                        $return['error'][$return['error']['length']]['type'] = 'Não foi encontrado nem um valor referente a seleção para o banco, defina ao menos um ou apenas não declare esta propriedade';
+
+                        # adiciona +1 em $return>error>length
+                        $return['error']['length']++;
+                    }
+                }
+
+                # valida se existe array em @post>return
+                if (is_array($post['return'])) {
+
+                    # valida se não existe algo na posição zero
+                    if (!array_key_exists('0', $post['return'])) {
+
+                        # define em @post>return com a função array_keys() os keys das arrays em lista numerica
+                        $post['return'] = array_keys($post['return']);
+
+                        # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
+                        $post['return']['length'] = count($post['return']);
+                    }
+
+                    # valida se existe algo na posição zero, adiciona a contagen lenght
+                    if (array_key_exists('0', $post['return'])) {
+
+                        # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
+                        $post['return']['length'] = count($post['return']);
+                    }
+                }
+            }
+
 
             # valida os campos que podem ser reconfigurados conforme um padrão
             # # 

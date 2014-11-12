@@ -4,7 +4,7 @@
 #
 
 # inclui classe de conexão ao banco de dados
-include 'sql.connect.php';
+# include 'sql.connect.php';
 
 # inclui funções de tratamento e manipulação para conexão do banco de dados
 include 'sql.selector.php';

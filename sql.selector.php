@@ -35,11 +35,13 @@ $temp['select']['table'] = $post['table'];
 # adiciona em @temp>select>where os campos de redundanca de seleção
 $temp['select']['where'] = $post['select'];
 
+$temp['select']['return'] = $post['select'];
+
 # trata os parametros para chamada do banco
 # # #
 
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
-$temp['resposta'] = select($temp['select'], false);
+$temp['resposta'] = select($temp['select'], true);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -59,6 +61,9 @@ function select($post, $print){
     # adiciona em @return>warning>length o valor 0
     $return['warning']['length'] = 0;
 
+    # adiciona em @return>backup os valores de @post
+    # $return['backup'] = $post;
+
     # # configura os valores de retorno
     # # # # #
 
@@ -70,7 +75,7 @@ function select($post, $print){
     $post['type'] = 'select';
 
     # adiciona em @temp>valida o valor recebido da função trata_query
-    $temp['valida'] = trata_query($post, true);
+    $temp['valida'] = trata_query($post, false);
 
     # verifica se houve algum problema no tratamento, com @temp>valida>successs sendo falso
     if ($temp['valida']['success'] == false) {
@@ -90,6 +95,10 @@ function select($post, $print){
 
     # verifica se o tratamento foi um successo, com @temp>valida>success sendo falso
     if ($temp['valida']['success'] == true) {
+
+        # define @post com os valores recebidos em @temp>valida>result
+        $post = $temp['valida']['result'];
+
 
         # adiciona em @return>error>trata_query>success com verdadeiro.
         $return['error']['trata_query']['success'] = true;
@@ -118,6 +127,10 @@ function select($post, $print){
     # caso @return>success seja valido inicia a aplicação
     if ($return['success'] == true) {
 
+        # declara em @temp>montagem>sql o inicio dos parametros de syntax de seleção tipo "SELEC" para o MySQL
+        $temp['montagem']['sql'] = 'SELECT ';
+
+
         # para enviar ao query deve ficar desta forma
         /*
         $Sel = mysql_query(
@@ -131,14 +144,114 @@ function select($post, $print){
         ") or die(mysql_error());
         */
 
-                
+        $return['backup'] = $post;
+
+        # # # #
+        # # tratamento para "SELECT"
+
+        # valida se existe apenas um resultado em @post>return, adicionando apenas o valor entre aspas
+        if ($post['return']['length'] == 1) {
+
+            # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, sem virgula com espaço ao final
+            $temp['montagem']['sql'] .= '`'. $post['return']['0'].'` ';
+        }
+
+        # valida se existe mais de um resultado em @post>return, adicionando os valores sequenciados por virgula
+        if ($post['return']['length'] > 1) {
+
+            # adiciona @temp>montagem>select>count com valor 0
+            $temp['montagem']['select']['count'] = 0;
+
+            # inicia loop para selecionar cada valor em @post>return
+            while ($temp['montagem']['select']['count'] < $post['return']['length']) {
+
+                # verifica se @temp>montagem>select>count esta na primeira posição em 0
+                if (($temp['montagem']['select']['count']) == 0) {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, sem virgula sem espaço ao final
+                    $temp['montagem']['sql'] .= '`'. $post['return'][$temp['montagem']['select']['count']].'`';
+                }
+
+                # verifica se @temp>montagem>select>count passou da primeira posição em 0
+                if ($temp['montagem']['select']['count'] > 0) {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, com virgula e espaço ao final
+                    $temp['montagem']['sql'] .= ', `'. $post['return'][$temp['montagem']['select']['count']].'` ';
+                }
+
+                # adiciona +1 no contador de @temp>montagem>select>count
+                $temp['montagem']['select']['count']++;
+            }
+
+            # apaga @temp>montagem>select
+            unset($temp['montagem']['select']);
+        }
+
+        # # tratamento para "SELECT"
+        # # # #
 
 
+        # # # #
+        # # tratamento para "TABLE"
+
+        # adiciona em @temp>montagem>sql o o parametro para tabela
+        $temp['montagem']['sql'] .= 'FROM '.$post['table'].' ';
+
+        # # tratamento para "TABLE"
+        # # # #
+
+
+        # # # #
+        # # tratamento para "WHERE"
+
+        # adiciona @temp>montagem>select>count com valor 0
+        $temp['montagem']['where']['count'] = 0;
+
+        # desmonta os valores de @post>where para @temp>montagem>where key e val
+        foreach ($post['where'] as $temp['montagem']['where']['key'] => $temp['montagem']['where']['val']) {
+
+            # verifica se @temp>montagem>select>count esta na primeira sequencia de chave
+            if ($temp['montagem']['where']['count'] == 0) {
+
+                # adiciona em @temp>montagem>sql a abertura da solicitação do tipo WHERE
+                $temp['montagem']['sql'] .= 'WHERE ';
+            }
+
+            # verifica se @temp>montagem>select>count passou da primeira sequencia de chave
+            if ($temp['montagem']['where']['count'] > 0) {
+
+                # adiciona em @temp>montagem>sql a abertura da solicitação do tipo AND
+                $temp['montagem']['sql'] .= 'AND ';
+            }
+
+            # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT WHERE"
+            $temp['montagem']['sql'] .= '`'. $temp['montagem']['where']['key'].'`';
+
+            # valida se o @post>regra>relative é verdadero pra valor relativo
+            if ($post['regra']['relative'] == true) {
+
+                # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores relativos
+                $temp['montagem']['sql'] .= ' LIKE \'%'.$temp['montagem']['where']['val'].'%\' ';
+            }
+
+            # valida se o @post>regra>relative é falso pra valor relativo, e verdadeiro para especifico
+            if ($post['regra']['relative'] == false) {
+
+                # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores especificos
+                $temp['montagem']['sql'] .= ' LIKE \''.$temp['montagem']['where']['val'].'\' ';
+            }
+
+            # adiciona +1 no contador de @temp>montagem>select>count
+            $temp['montagem']['where']['count']++;
+        }
+        # # tratamento para "WHERE"
+        # # # #
     }
 
     # # inicia tratamento dos valores recebidos
     # # # # #
 
+    $return['temp'] = $temp;
 
     # # # # # # # # #
     # # Finaliza exibindo o resultado
@@ -422,14 +535,14 @@ function trata_query($post, $print){
                         $post['return'] = array_keys($post['return']);
 
                         # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
-                        $post['return']['length'] = count($post['return']);
+                        $post['return']['length'] = count($post['return'])-1;
                     }
 
                     # valida se existe algo na posição zero, adiciona a contagen lenght
                     if (array_key_exists('0', $post['return'])) {
 
                         # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
-                        $post['return']['length'] = count($post['return']);
+                        $post['return']['length'] = count($post['return'])-1;
                     }
                 }
             }

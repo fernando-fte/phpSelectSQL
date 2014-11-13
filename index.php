@@ -22,8 +22,7 @@ array(
     'type' => 'select',
     'table' => 'tabela',
     'select' => array(
-        'segmento' => 'caso clinico',
-        'type' => 'chamada'
+        'segmento' => 'page'
     )
 );
 /**
@@ -43,7 +42,7 @@ $temp['select']['table'] = $post['table'];
 $temp['select']['where'] = $post['select'];
 
 # adiciona em @temp>select>return os campos para retorno do MySQL como uma lista array numérica
-$temp['select']['return'] = array('index', 'sku');
+$temp['select']['return'] = array('sku', 'values');
 
 // # adiciona em @temp>select>return os campos para retorno do MySQL com os mesmos valores contidos em @post>select
 // $temp['select']['return'] = $post['select'];
@@ -64,7 +63,7 @@ $temp['select']['regra']['limit'] = '2';
 # # #
 
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
-$temp['resposta'] = select($temp['select'], true);
+$temp['resposta'] = select($temp['select'], false);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 ?>

@@ -34,12 +34,180 @@ function query($post, $print){
     $return['warning']['length'] = 0;
 
     # adiciona em @return>backup os valores de @post
-    # $return['backup'] = $post;
+    $return['backup'] = $post;
 
     # define @return>process
 
     # # configura os valores de retorno
     # # # # #
+
+
+    # # # # #
+    # # inicia capturação dos dados no banco
+    
+    # valida se não existe type em @post, identificando qual o tipo de solicitação
+    if (!array_key_exists('type', $post)) {
+
+        # adiciona em @return>error>[@~length]>type o um relato do que houve
+        $return['error'][$return['error']['length']]['type'] = 'Não existe o type declarado, dessa forma não sera possivel preparar os valores para seleção do banco';
+
+        # adiciona +1 em $return>error>length
+        $return['error']['length']++;
+    }
+
+    # valida se existe type em @post, identificando qual o tipo de solicitação
+    if (array_key_exists('type', $post)) {
+
+        # caso @post>type seja do tipo "query", inicia as seleções
+        if ($post['type'] == 'query') {
+
+            # adiciona em @temp>connect>mysql os dados de conexão do servidor MySQL
+            $temp['connect']['mysql'] = mysql_connect('localhost', 'root', '');
+
+            # valida se @temp>connect>msyql não estabeleceu conexão
+            if (mysql_error() != false) {
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Não foi possivel connectar ao MySQL, verifique os dados de conexão';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+            }
+
+            # valida se @temp>connect>msyql estabeleceu conexão
+            if (mysql_error() == false) {
+
+                # adiciona em @temp>connect>banco a conxão com o banco
+                $temp['connect']['banco'] = mysql_select_db('meubanco', $temp['connect']['mysql']);
+
+                # valida se @temp>connect>banco não foi conectado ou encontrado
+                if (mysql_error() != false) {
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['error'][$return['error']['length']]['type'] = 'Não foi possivel conectar-se ao banco, verifique os dados de conexão';
+
+                    # adiciona +1 em $return>error>length
+                    $return['error']['length']++;
+                }
+
+                # valida se @temp>connect>banco foi conectado ou encontrado
+                if (mysql_error() == false) {
+
+                    # adiciona em query os valores para a função mysql_query()
+                    mysql_query("SET NAMES 'utf8'");
+                    mysql_query('SET character_set_connection=utf8');
+                    mysql_query('SET character_set_client=utf8');
+                    mysql_query('SET character_set_results=utf8');
+
+                    # adiciona em @temp>connect>result o resultado da insersão dos paramestros no banco
+                    $temp['connect']['result'] = mysql_query($post['sql']);
+                    // $temp['connect']['result'] = mysql_query("SELECT `sku`, `values` FROM `tabela` WHERE `segmento` LIKE 'page' ORDER BY `index` ASC LIMIT 2");
+                    // $temp['connect']['result'] = mysql_query("INSERT INTO `tabela` (`segmento`, `index`, `grupo`, `type`, `values`, `sku`) VALUES ('teste', '1', NULL, NULL, 't', '58f2f5cf43')");
+                    // $temp['connect']['result'] = mysql_query("DELETE FROM `tabela` WHERE `sku` LIKE '58f2f5cf43'");
+                    // $temp['connect']['result'] = mysql_query("UPDATE `tabela` SET `grupo` = 'b', `type` = 'b' WHERE `sku` = '58f2f5cf43' LIMIT 1");
+
+                    # valida se @temp>connect>result não conseguiu ser executado
+                    if (mysql_error() != false) {
+
+                        # adiciona em @return>error>[@~length]>type o um relato do que houve
+                        $return['error'][$return['error']['length']]['type'] = 'Algo de inesperado aconteceu, verifique as informações em erro->log';
+
+                        # adiciona em @return>error>[@~length]>log o erro da função mysql_error()
+                        $return['error'][$return['error']['length']]['log'] = mysql_error();
+
+                        # adiciona +1 em $return>error>length
+                        $return['error']['length']++;
+                    }
+
+                    # valida se @temp>connect>result conseguiu ser executado
+                    if (mysql_error() == false) {
+
+                            $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
+                            $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
+                            $return['result']['all'] = $temp['connect']['result'];
+
+                            if (mysql_fetch_assoc($temp['connect']['result']) == false) {
+
+                                # explode valores de @temp>connect>result
+                                $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
+                                $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
+                                $return['result']['all'] = $temp['connect']['result'];
+                            }
+
+                            if (mysql_fetch_assoc($temp['connect']['result']) == true) {
+
+                                # explode valores de @temp>connect>result
+                                echo 'a';
+                            }
+
+                    }
+                }
+
+                # adiciona em @temp>connect>close o fechamento da conexão com MySQL
+                $temp['connect']['close'] = mysql_close($temp['connect']['mysql']);
+            }
+        }
+
+        # caso @post>type não seja do tipo "query", reeencaminha as validações conforme os atributos corretos
+        if (!$post['type'] == 'query') {
+
+            # encaminhas valores conforme as funções de chamada
+            switch ($post['type']) {
+
+                # caso @post>type seja "select"
+                case 'select':
+
+                    # adiciona em @return os valores de resposta vindos da função select()
+                    $return = select($post, false);
+                    break;
+
+                # caso @post>type seja "insert"
+                case 'insert':
+
+                    # adiciona em @return os valores de resposta vindos da função insert()
+                    $return = insert($post, false);
+                    break;
+
+                # caso @post>type seja "update"
+                case 'update':
+
+                    # adiciona em @return os valores de resposta vindos da função update()
+                    $return = update($post, false);
+                    break;
+                
+                default:
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['error'][$return['error']['length']]['type'] = 'O valor declarado em type não coincide com nem uma ação definida, podendo ser ("query", "insert", "update", "select")';
+
+                    # adiciona +1 em $return>error>length
+                    $return['error']['length']++;
+                    break;
+            }
+        }
+    }
+
+    # # inicia capturação dos dados no banco
+    # # # # #
+
+
+    # # # # # # # # #
+    # # Finaliza exibindo o resultado
+    # caso @print seja verdadeiro, exibe return
+    if($print == true){
+
+        # imprime na tela os valores de #return
+        print_r($return);
+    }
+
+    # caso @print seja falso apenas retorna o valor
+    if($print == false){
+
+        # retorna o valor de @return
+        return $return;
+    }
+    # # Finaliza exibindo o resultado
+    # # # # # # # # #
 }
 
 # Função: solicita ao MySQL os valores conforme os parametros
@@ -338,13 +506,13 @@ function select($post, $print){
         if ($return['process']['montagem']['success'] == true) {
 
             # adiciona em @temp>select>sql o valor do resultado em @return>montagem>result
-            $temp['select']['sql'] = $return['montagem']['result'];
+            $temp['select']['sql'] = $return['process']['montagem']['result'];
 
             # adiciona a propriedade "query" em @temp>select>type
             $temp['select']['type'] = 'query';
 
             # adiciona em @temp>select>result as respostas do servidor e define impressão como falsa
-            // $temp['select']['result'] = query($temp['select'], false);
+            $temp['select']['result'] = query($temp['select'], true);
 
 
         }

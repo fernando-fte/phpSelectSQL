@@ -126,9 +126,33 @@ function query($post, $print){
                         if (mysql_num_rows($temp['connect']['result']) == true) {
 
                             # explode valores de @temp>connect>result
-                            $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
-                            $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
-                            $return['result']['all'] = $temp['connect']['result'];
+                            // $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
+                            // $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
+                            // $return['result']['all'] = $temp['connect']['result'];
+                            // $return['result']['sql'] = $post['sql'];
+
+                            // # inicia separação dos conteúdo
+                            // while ($temp['result']['change'] = mysql_fetch_array($temp['connect']['result'])) {
+                                // 
+                                // print_r($temp['result']['change']);
+                            // }
+
+                            // echo "\n\n";
+                            // print_r($temp);
+                            // echo "\n\n";
+                            // print_r($return);
+                            // echo "\n\n";
+
+                            # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
+
+                            # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
+
+                            # adiciona em @return>result>labels os campos retornados em @return>result>0
+
+                                # adiciona em @return>result>labels>lenght a quantidade de campos com a função count()
+
+                            # valida se @return>result>lenght é maior que 1
+
                         }
 
                         # valida se não existe colunas de resultados em @temp>connect>result, para retorno

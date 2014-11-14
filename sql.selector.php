@@ -102,9 +102,9 @@ function query($post, $print){
                     # adiciona em @temp>connect>result o resultado da insersão dos paramestros no banco
                     $temp['connect']['result'] = mysql_query($post['sql']);
                     // $temp['connect']['result'] = mysql_query("SELECT `sku`, `values` FROM `tabela` WHERE `segmento` LIKE 'page' ORDER BY `index` ASC LIMIT 2");
-                    // $temp['connect']['result'] = mysql_query("INSERT INTO `tabela` (`segmento`, `index`, `grupo`, `type`, `values`, `sku`) VALUES ('teste', '1', NULL, NULL, 't', '58f2f5cf43')");
-                    // $temp['connect']['result'] = mysql_query("DELETE FROM `tabela` WHERE `sku` LIKE '58f2f5cf43'");
-                    // $temp['connect']['result'] = mysql_query("UPDATE `tabela` SET `grupo` = 'b', `type` = 'b' WHERE `sku` = '58f2f5cf43' LIMIT 1");
+                    // $temp['connect']['result'] = mysql_query("INSERT INTO `tabela` (`segmento`, `index`, `grupo`, `type`, `values`, `sku`) VALUES ('teste', '1', NULL, NULL, 't', '58f2f5cf4a')");
+                    // $temp['connect']['result'] = mysql_query("DELETE FROM `tabela` WHERE `sku` LIKE '58f2f5cf4a'");
+                    // $temp['connect']['result'] = mysql_query("UPDATE `tabela` SET `grupo` = 'b', `type` = 'b' WHERE `sku` = '58f2f5cf4a' LIMIT 1");
 
                     # valida se @temp>connect>result não conseguiu ser executado
                     if (mysql_error() != false) {
@@ -122,24 +122,21 @@ function query($post, $print){
                     # valida se @temp>connect>result conseguiu ser executado
                     if (mysql_error() == false) {
 
+                        # valida se existe colunas de resultados em @temp>connect>result, para retorno
+                        if (mysql_num_rows($temp['connect']['result']) == true) {
+
+                            # explode valores de @temp>connect>result
                             $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
                             $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
                             $return['result']['all'] = $temp['connect']['result'];
+                        }
 
-                            if (mysql_fetch_assoc($temp['connect']['result']) == false) {
+                        # valida se não existe colunas de resultados em @temp>connect>result, para retorno
+                        if (mysql_num_rows($temp['connect']['result']) == false) {
 
-                                # explode valores de @temp>connect>result
-                                $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
-                                $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
-                                $return['result']['all'] = $temp['connect']['result'];
-                            }
-
-                            if (mysql_fetch_assoc($temp['connect']['result']) == true) {
-
-                                # explode valores de @temp>connect>result
-                                echo 'a';
-                            }
-
+                            # define @return>result como valido
+                            $return['result'] = true;
+                        }
                     }
                 }
 

@@ -63,7 +63,7 @@ $temp['select']['regra']['limit'] = '2';
 # # #
 
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
-$temp['resposta'] = select($temp['select'], false);
+$temp['resposta'] = select($temp['select'], true);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 ?>

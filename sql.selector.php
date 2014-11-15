@@ -1,5 +1,5 @@
 ﻿<?php
-ini_set("display_errors", 0);
+# ini_set("display_errors", 0);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Inclui funções e regras pre-determinadas
@@ -18,7 +18,6 @@ include 'sql.connect.php';
 
 # # # # # # # # # # #
 # Função: solicita ao MySQL os valores conforme os parametros
-
 function query($post, $print){
 
     # # # # #
@@ -122,45 +121,8 @@ function query($post, $print){
                     # valida se @temp>connect>result conseguiu ser executado
                     if (mysql_error() == false) {
 
-                        # valida se existe colunas de resultados em @temp>connect>result, para retorno
-                        if (mysql_num_rows($temp['connect']['result']) == true) {
-
-                            # explode valores de @temp>connect>result
-                            // $return['result']['num'] = mysql_num_rows($temp['connect']['result']);
-                            // $return['result']['assoc'] = mysql_fetch_assoc($temp['connect']['result']);
-                            // $return['result']['all'] = $temp['connect']['result'];
-                            // $return['result']['sql'] = $post['sql'];
-
-                            // # inicia separação dos conteúdo
-                            // while ($temp['result']['change'] = mysql_fetch_array($temp['connect']['result'])) {
-                                // 
-                                // print_r($temp['result']['change']);
-                            // }
-
-                            // echo "\n\n";
-                            // print_r($temp);
-                            // echo "\n\n";
-                            // print_r($return);
-                            // echo "\n\n";
-
-                            # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
-
-                            # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
-
-                            # adiciona em @return>result>labels os campos retornados em @return>result>0
-
-                                # adiciona em @return>result>labels>lenght a quantidade de campos com a função count()
-
-                            # valida se @return>result>lenght é maior que 1
-
-                        }
-
-                        # valida se não existe colunas de resultados em @temp>connect>result, para retorno
-                        if (mysql_num_rows($temp['connect']['result']) == false) {
-
-                            # define @return>result como valido
-                            $return['result'] = true;
-                        }
+                        # adiciona em @retrun>result o resultado de @temp>connect>result
+                        $return['result'] = $temp['connect']['result'];
                     }
                 }
 
@@ -212,6 +174,19 @@ function query($post, $print){
     # # # # #
 
 
+    # # # # #
+    # # Finializa validação
+
+    # valida se @return>error>length é maior que 0
+    if ($return['error']['length'] > 0) {
+
+        # adiciona em @return>success com bolean:false
+        $return['success'] = false;
+    }
+    # # Finializa validação
+    # # # # #
+
+
     # # # # # # # # #
     # # Finaliza exibindo o resultado
     # caso @print seja verdadeiro, exibe return
@@ -230,7 +205,6 @@ function query($post, $print){
     # # Finaliza exibindo o resultado
     # # # # # # # # #
 }
-
 # Função: solicita ao MySQL os valores conforme os parametros
 # # # # # # # # # # #
 
@@ -533,9 +507,84 @@ function select($post, $print){
             $temp['select']['type'] = 'query';
 
             # adiciona em @temp>select>result as respostas do servidor e define impressão como falsa
-            $temp['select']['result'] = query($temp['select'], true);
+            $temp['select']['result'] = query($temp['select'], false);
 
 
+            # verifica se houve algum problema no tratamento, com @temp>select>successs sendo falso
+            if ($temp['select']['result']['success'] == false) {
+
+                # adiciona em @return>success com false, para abortar as validações
+                $return['success'] = false;
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Houve algum erro na solicitação dos conteudos ao banco de dados, consulte a lista de erros do processo "sql"';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+
+                # adiciona em @return>error>sql os valores de valida.
+                $return['process']['sql']['error'] = $temp['select']['result'];
+            }
+
+            # verifica se o tratamento foi um successo, com @temp>select>success sendo falso
+            if ($temp['select']['result']['success'] == true) {
+
+                # adiciona em @return>error>sql>success com verdadeiro.
+                $return['process']['select']['success'] = true;
+
+                # verifica se existe algum alerta e adicioina a estrutura de @~sql
+                if ($temp['select']['result']['warning']['length'] > 0) {
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['error']['length']]['type'] = 'Algo não saiu como esperado e houve alguns alertas no processo "select"';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+
+                    # adiciona os valores de @temp>select>warning em @return>warning>sql
+                    $return['process']['select']['warning'] = $temp['select']['result']['warning'];
+                }
+
+                # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
+                $return['result']['length'] = mysql_num_rows($temp['select']['result']['result']);
+
+                # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
+                $return['result']['0'] = mysql_fetch_assoc($temp['select']['result']['result']);
+
+                # adiciona em @return>result>labels os campos retornados em @return>result>0
+                $return['result']['labels'] = array_keys($return['result']['0']);
+
+                # adiciona em @return>result>labels>length a contagem dos valores de chaves para @return>result>labels
+                $return['result']['labels']['length'] = count($return['result']['labels']);
+
+                # valida se @return>result>lenght é maior que 1, para mais valores retornados
+                if ($return['result']['length'] > '1') {
+
+                    # adiciona em @temp>select>count o valor de 1 para o contador
+                    $temp['select']['count'] = 1;
+
+                    # inicia loop para selecionar cada valor em @temp>select>return>return
+                    while ($temp['select']['content'] = mysql_fetch_array($temp['select']['result']['result'])) {
+
+                        # adiciona em @retrurn>result>@~count para selcionar cada valor capturado no loop
+                        $return['result'][$temp['select']['count']] = $temp['select']['content'];
+
+
+                        # remove todos os resultados numéricos
+                        for ($i=0; $i < $return['result']['labels']['length']; $i++) { 
+
+                            # apaga @return>result>@~count>@~ na posição atual
+                            unset($return['result'][$temp['select']['count']][$i]);
+                        }
+
+                        # apaga @i criado em for()
+                        unset($i);
+
+                        # adiciona +1 em @temp>select>count
+                        $temp['select']['count']++;
+                    }
+                }
+            }
         }
 
         # # Inicia montagem dos valores para select
@@ -545,6 +594,18 @@ function select($post, $print){
     # # inicia tratamento dos valores recebidos
     # # # # #
 
+
+    # # # # #
+    # # Finializa validação
+
+    # valida se @return>error>length é maior que 0
+    if ($return['error']['length'] > 0) {
+
+        # adiciona em @return>success com bolean:false
+        $return['success'] = false;
+    }
+    # # Finializa validação
+    # # # # #
 
 
     # # # # # # # # #
@@ -915,187 +976,4 @@ function trata_query($post, $print){
 }
 # Função: valida valores arrays e restrurura
 # # # # # # # # # # #
-
-
-
-/*
-# abre conexao
-$conecta->AbreConexao();
-
-# seta o valor query
-$Sel = mysql_query(
-    "SELECT `segmento`, `index`
-    FROM `tabela` 
-    WHERE `segmento` LIKE 'caso clinico' 
-    AND `grupo` LIKE '1' 
-    AND `type` LIKE 'image'
-    ORDER BY `index` DESC
-    LIMIT 3
-") or die(mysql_error());
-
-# fecha a conexao
-$conecta->FechaConexao();
-
-# laço para processar e atriubir dentro de value os resultados do banco
-while ($val = mysql_fetch_array($Sel)) {
-
-    print_r($val);
-}
-
-
-print_r(array("a", "b", "c"));
-*/
-
-/*
-# # # # # # # # # #
-# forma esperada
-
-$temp['select']['return'] = string | array("a", "b", "c")
-$temp['select']['tabela'] = string
-$temp['select']['where']['relative'] = bolean | true = array("a", "b", "c")
-$temp['select']['where']['contents'] = array("select" => "val", "grupo" => "1")
-$temp['select']['regra']['limit'] = {0,1,2,3, [...]};
-$temp['select']['regra']['order']['to'] = string;
-$temp['select']['regra']['order']['by'] = ASC | DESC;
-
-# forma esperada
-# # # # # # # # # #
-
-# # # # # # # # # #
-# forma reduzido
-
-$temp['return']
-$temp['tabela']
-$temp['relative']
-$temp['where']
-$temp['limit']
-$temp['order']['to']
-$temp['order']['by']
-
-function(temp)
-# forma reduzido
-# # # # # # # # # #
-*/
-
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# # # Função de tratamento para valores do tipo 'select'
-// function select($temp){
-
-//     # valida itens necessarios
-//     if(array_key_exists('key', $temp)){
-
-//     }
-
-// }
-# # # Função de tratamento para valores do tipo 'select'
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-
-
-# # # # #
-# função para validar se as entradas do $_POST são corretas
-// function valida_select($temp) {
-
-//     # #
-//     # quando não existir a array "regra", adiciona as configurações necessárias
-//     if (!array_key_exists("regra", $temp)) {
-
-//         # adiciona na array @temp>regra>where o valor que a busca é fixa (LIKE | LIKE%)
-//         $temp['regra']['where'] = "LIKE";
-        
-//         # adiciona na array @temp>regra>limit que a resposta do servidor será apenas '1'
-//         $temp['regra']['limit'] = "1";
-
-//         # adiciona na array @temp>order>to que a busca sera ordenada em "index"
-//         $temp['regra']['order']['to'] = "index";
-
-//         # adiciona na array @temp>order>by que a busca será ordenada do menor para o maior
-//         $temp['regra']['order']['by'] = "ASC";
-//     }
-//     # Fim da 'quando não existir a array "regra", adiciona as configurações necessárias'
-//     # #
-
-//     # #
-//     # trata elementos caso exista a array "regra", valida cada item dentro da mesma 
-//     else {
-//         # #
-//         # valida "where" que estabelece a seleção
-//         if(!array_key_exists("where", $temp['regra'])) {
-
-//             # adiciona na array @temp>regra>where o valor que a busca é fixa (LIKE | LIKE%)
-//             $temp['regra']['where'] = "LIKE";
-//         }
-//         # Fim de 'valida "where" que estabelece a seleção'
-//         # #
-
-//         # #
-//         # valida se há "order" que estabelece a ordem das respostas (que a coluna "X" exibida de 0 -> ∞ ou ∞ -> 0)
-//         if(!array_key_exists("order", $temp['regra'])) {
-
-//             # adiciona na array @temp>order>to que a busca sera ordenada em "index"
-//             $temp['regra']['order']['to'] = "index";
-
-//             # adiciona na array @temp>order>by que a busca será ordenada do menor para o maior
-//             $temp['regra']['order']['by'] = "ASC";
-//         }
-//         # Fim de 'valida se há "order" que estabelece a ordem das respostas (que a coluna "X" exibida de 0 -> ∞ ou ∞ -> 0)'
-//         # #
-
-//         # #
-//         # valida se os valores de "order" estão corretos
-//         else { 
-
-//             # #
-//             # valida se há "order>to"
-//             if(!array_key_exists("to", $temp['regra']['order'])) {
-
-//                 # adiciona na array @temp>order>to que a busca sera ordenada em "index"
-//                 $temp['regra']['order']['to'] = "index";
-//             }
-//             # Fim de 'valida se há "order>to"'
-//             # #
-
-//             # #
-//             # valida se há "order>by"
-//             if(!array_key_exists("by", $temp['regra']['order'])) {
-
-//                 # adiciona na array @temp>order>by que a busca será ordenada do menor para o maior
-//                 $temp['regra']['order']['by'] = "ASC";
-//             }
-//             # Fim de 'valida se há "order>by"'
-//             # #
-//         }
-//         # Fim de "valida se os valores de "order" estão corretos"
-//         # #
-
-//         # #
-//         # valida se há "limit", e este define quantos resultados o banco deve retornar
-//         if(!array_key_exists("limit", $temp['regra'])) {
-
-//             # adiciona na array @temp>regra>limit que a resposta do servidor será apenas '1'
-//             $temp['regra']['limit'] = "1";
-//         }
-//         # valida se há "limit", e este define quantos resultados o banco deve retornar
-//         # #
-//     }
-//     # Fim de 'trata elementos caso exista a array "regra", valida cada item dentro da mesma '
-//     # #
-
-//     # #
-//     # valida a array "status" existe
-//     if(!array_key_exists("status", $temp)){
-
-//         # determina que "status" é falso
-//         $temp['status'] = false;
-//     }
-//     # Fim de 'valida a array "status"'
-//     # #
-
-//     # retorna $temp para a função
-//     return $temp;
-// }
-# função para validar se as entradas do $_POST são corretas
-# # # # #
-
 ?>

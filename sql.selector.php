@@ -548,17 +548,38 @@ function select($post, $print){
                 # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
                 $return['result']['length'] = mysql_num_rows($temp['select']['result']['result']);
 
-                # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
-                $return['result']['0'] = mysql_fetch_assoc($temp['select']['result']['result']);
+                # valida se @return>result>lenght é igual zero, para nem um valor retornado
+                if ($return['result']['length'] == 0) {
 
-                # adiciona em @return>result>labels os campos retornados em @return>result>0
-                $return['result']['labels'] = array_keys($return['result']['0']);
+                    # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
+                    $return['result']['length'] = 0;
 
-                # adiciona em @return>result>labels>length a contagem dos valores de chaves para @return>result>labels
-                $return['result']['labels']['length'] = count($return['result']['labels']);
+                    # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
+                    $return['result']['0'] = null;
+
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['error']['length']]['type'] = 'Não foi encontrado nem um resultado com os parametros passados';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+                }
+
+                # valida se @return>result>lenght é igual a 1 ou maior que zero, para mais valores retornados
+                if ($return['result']['length'] > 0) {
+
+                    # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
+                    $return['result']['0'] = mysql_fetch_assoc($temp['select']['result']['result']);
+
+                    # adiciona em @return>result>labels os campos retornados em @return>result>0
+                    $return['result']['labels'] = array_keys($return['result']['0']);
+
+                    # adiciona em @return>result>labels>length a contagem dos valores de chaves para @return>result>labels
+                    $return['result']['labels']['length'] = count($return['result']['labels']);
+                }
 
                 # valida se @return>result>lenght é maior que 1, para mais valores retornados
-                if ($return['result']['length'] > '1') {
+                if ($return['result']['length'] > 1) {
 
                     # adiciona em @temp>select>count o valor de 1 para o contador
                     $temp['select']['count'] = 1;

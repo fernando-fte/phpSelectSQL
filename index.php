@@ -91,6 +91,75 @@ unset($_POST);
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
 
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+$_POST =
+array(
+    'type' => 'insert',
+    'table' => 'tabela',
+    'select' => array(
+        'segmento' => 'galeria',
+        // 'segmento' => 'docentes',
+        // 'grupo' => 'professor',
+        // 'type' => 'Laurindo Furquim'
+    )
+);
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+
+# adiciona em @post os valores de _POST
+$post = $_POST;
+
+
+# # #
+# trata dados de @post, de acordo com a estrutura do banco
+
+$temp['insert']['select']['regra']['limit'] = '1';
+$temp['insert']['select']['regra']['order']['to'] = 'index';
+$temp['insert']['select']['regra']['order']['by'] = 'DESC';
+$temp['insert']['select']['where'] = $post['select'];
+$temp['insert']['select']['table'] = $post['table'];
+$temp['insert']['select']['return'] = 'index';
+$temp['insert']['select']['change'] = select($temp['insert']['select'], false);
+
+# valida se não foi encontrado nem resultado
+if ($temp['insert']['select']['change']['result']['length'] == 0) {
+
+    # adiciona em @post>select>index o valor para index
+    $post['select']['index'] = 0;
+}
+
+# valida se foi encontrado algum resultado
+if ($temp['insert']['select']['change']['result']['length'] > 0) {
+
+    # adiciona em @post>select>index o valor para index
+    $post['select']['index'] = $temp['insert']['select']['change']['result']['0']['index']+1;
+}
+
+
+# trata dados de @post, de acordo com a estrutura do banco
+# # #
+
+
+
+
+# # #
+# trata os parametros para a insersão no banco
+
+# adiciona em @temp>insert>table o a tabela em @post
+// $temp['insert']['table'] = $post['table'];
+
+# adiciona em @temp>insert>values os campos de redundanca de seleção
+// $temp['insert']['values'] = $post['select'];
+
+# trata os parametros para a insersão no banco
+# # #
+
+# adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
+// $temp['resposta'] = insert($temp['insert'], true);
+
 # # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 

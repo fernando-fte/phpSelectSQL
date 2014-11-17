@@ -14,6 +14,9 @@ include 'sql.selector.php';
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # #  SELECT # # # # # # # # # # # # # # # 
+
 /**
 // modelo de informações mínimas vindas por $_POST para seleção do banco
 **/
@@ -31,6 +34,7 @@ array(
 
 # adiciona em @post os valores de _POST
 $post = $_POST;
+
 
 # # #
 # trata os parametros para chamada do banco
@@ -63,7 +67,34 @@ $temp['select']['regra']['limit'] = '2';
 # # #
 
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
-$temp['resposta'] = select($temp['select'], true);
+$temp['resposta'] = select($temp['select'], false);
 
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # #
+# apaga itens usados na manipulação
+
+# apaga @temp
+unset($temp);
+
+# apara @post
+unset($post);
+
+# apara _POST
+unset($_POST);
+
+# apaga itens usados na manipulação
+# # #
+
+# # # # # # # # # # # # # # #  SELECT # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
+
+# # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+
+
+
 ?>

@@ -232,9 +232,7 @@ function select($post, $print){
     $return['warning']['length'] = 0;
 
     # adiciona em @return>backup os valores de @post
-    # $return['backup'] = $post;
-
-    # define @return>process
+    $return['backup'] = $post;
 
     # # configura os valores de retorno
     # # # # #
@@ -658,7 +656,7 @@ function select($post, $print){
 # # # # # # # # # # #
 
 # # # # # # # # # # #
-# Função: trata os valores para a função select ao banco mysql
+# Função: trata os valores para a função insert ao banco mysql
 function insert($post, $print){
 
     # # # # #
@@ -674,7 +672,7 @@ function insert($post, $print){
     $return['warning']['length'] = 0;
 
     # adiciona em @return>backup os valores de @post
-    # $return['backup'] = $post;
+    $return['backup'] = $post;
 
     # define @return>process
 
@@ -1013,9 +1011,200 @@ function insert($post, $print){
     # # Finaliza exibindo o resultado
     # # # # # # # # #
 }
-# Função: trata os valores para a função select ao banco mysql
+# Função: trata os valores para a função insert ao banco mysql
 # # # # # # # # # # #
 
+# # # # # # # # # # #
+# Função: trata os valores para a função update ao banco mysql
+function update($post, $print){
+
+    # # # # #
+    # # configura os valores de retorno
+
+    # adiciona em @return>success com true, para iniciar as validações
+    $return['success'] = true;
+
+    # adiciona em @return>error>length o valor 0
+    $return['error']['length'] = 0;
+
+    # adiciona em @return>warning>length o valor 0
+    $return['warning']['length'] = 0;
+
+    # adiciona em @return>backup os valores de @post
+    $return['backup'] = $post;
+
+    # define @return>process
+
+    # # configura os valores de retorno
+    # # # # #
+
+
+    # # # # #
+    # # valida os valores recebidos em @post
+
+    # declara @post>type como insert
+    $post['type'] = 'update';
+
+    # adiciona em @temp>valida o valor recebido da função trata_query
+    $temp['valida'] = trata_query($post, false);
+
+    # verifica se houve algum problema no tratamento, com @temp>valida>successs sendo falso
+    if ($temp['valida']['success'] == false) {
+
+        # adiciona em @return>success com false, para abortar as validações
+        $return['success'] = false;
+
+        # adiciona em @return>error>[@~length]>type o um relato do que houve
+        $return['error'][$return['error']['length']]['type'] = 'Houve algum erro na manipulação dos conteudos no momento da validação, consulte a lista de erros de "trata_query"';
+
+        # adiciona +1 em $return>error>length
+        $return['error']['length']++;
+
+        # adiciona em @return>error>trata_query os valores de valida.
+        $return['process']['trata_query']['error'] = $temp['valida'];
+    }
+
+    # verifica se o tratamento foi um successo, com @temp>valida>success sendo falso
+    if ($temp['valida']['success'] == true) {
+
+        # define @post com os valores recebidos em @temp>valida>result
+        $post = $temp['valida']['result'];
+
+
+        # adiciona em @return>error>trata_query>success com verdadeiro.
+        $return['process']['trata_query']['success'] = true;
+
+        # verifica se existe algum alerta e adicioina a estrutura de @~trata_query
+        if ($temp['valida']['warning']['length'] > 0) {
+
+            # adiciona em @return>error>[@~length]>type o um relato do que houve
+            $return['warning'][$return['error']['length']]['type'] = 'Algo não saiu como esperado e houve alguns alertas no processo "trata_query"';
+
+            # adiciona +1 em $return>error>length
+            $return['warning']['length']++;
+
+            # adiciona os valores de @temp>valida>warning em @return>warning>trata_query
+            $return['process']['trata_query']['warning'] = $temp['valida']['warning'];
+        }
+    }
+
+    # apaga @temp>valida
+    unset($temp['valida']);
+
+    # # valida os valores recebidos em @post
+    # # # # #
+
+/**
+UPDATE `tabela` 
+SET `grupo` = 'b', `type` = 'b' 
+WHERE `sku` = '58f2f5cf4a' 
+ORDER BY 
+LIMIT 1
+**/
+
+
+    # # # # #
+    # # inicia tratamento dos valores recebidos
+
+    # caso @return>success seja valido inicia a aplicação
+    if ($return['success'] == true) {
+
+        # # # # #
+        # # configura os valores de retorno
+
+        # # #
+        # define valores em @return>process>montagem para montagem
+
+        # define @return>process>montagem>success com false, a espera de montagem
+        $return['process']['montagem']['success'] = false;
+
+        # define @return>process>montagem>error como NULL para sem erros
+        $return['process']['montagem']['error'] = null;
+
+        # define @return>process>montagem>warning como NULL para sem alertas
+        $return['process']['montagem']['warning'] = null;
+
+        # # #
+
+        # #
+        # define valores em @return>process>montagem para montagem
+
+        # define @return>process>montagem>success com false, a espera de montagem
+        $return['process']['insert']['success'] = false;
+
+        # define @return>process>montagem>error como NULL para sem erros
+        $return['process']['insert']['error'] = null;
+
+        # define @return>process>montagem>warning como NULL para sem alertas
+        $return['process']['insert']['warning'] = null;
+        # # #
+
+        # # configura os valores de retorno
+        # # # # #
+
+
+        # # # # #
+        # Inicia montagem dos valores para "INSERT"
+
+        # valida @return>process>montagem>success é "false", inicia montagem de select
+        if ($return['process']['montagem']['success'] == false) {
+
+        }
+
+        # Inicia montagem dos valores para "INSERT"
+        # # # # #
+
+
+        # # # # #
+        # # Inicia envio para o MySQL os valores para insert
+
+        # valida @return>process>montagem>success é "true" para o tratamento dos parametros "SELECT"
+        if ($return['process']['montagem']['success'] == true) {
+
+        }
+
+        # # Inicia envio para o MySQL os valores para insert
+        # # # # #
+
+    }
+
+    # # inicia tratamento dos valores recebidos
+    # # # # #
+
+
+    # # # # #
+    # # Finializa validação
+
+    # valida se @return>error>length é maior que 0
+    if ($return['error']['length'] > 0) {
+
+        # adiciona em @return>success com bolean:false
+        $return['success'] = false;
+    }
+    # # Finializa validação
+    # # # # #
+
+
+    # # # # # # # # #
+    # # Finaliza exibindo o resultado
+    # caso @print seja verdadeiro, exibe return
+    if($print == true){
+
+        # imprime na tela os valores de #return
+        print_r($return);
+    }
+
+    # caso @print seja falso apenas retorna o valor
+    if($print == false){
+
+        # retorna o valor de @return
+        return $return;
+    }
+    # # Finaliza exibindo o resultado
+    # # # # # # # # #
+}
+# Função: trata os valores para a função update ao banco mysql
+# # # # # # # # # # #
 
 # # # # # # # # # # #
 # Função: valida valores arrays e restrurura
@@ -1300,8 +1489,247 @@ function trata_query($post, $print){
         # # #
         # caso @post>type seja do tipo "select"
         else if ($post['type'] == 'update') {
-            
-            # inicia validação conforme os valore
+
+            # #
+            # valida os campos não configuraveis internamente
+
+            # valida se existe em @post a arary where, que contem os dados de seleção
+            if (array_key_exists('where', $post)) {
+
+                # valida se @post>where não possui elementos arrays
+                if (!is_array($post['where'])){
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['error'][$return['error']['length']]['type'] = 'O conteúdo de where esta incompatível, era esperado arrays com valores para seleção do banco';
+
+                    # adiciona +1 em $return>error>length
+                    $return['error']['length']++;
+                }
+            }
+
+            # valida se não existe em @post a arary where, que deve conter todos os dados
+            if (!array_key_exists('where', $post)){
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Não existe o grupo where que contem os valores de afunilamento na seleção do banco';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+            }
+
+
+            # valida se existe em @post a arary values, que contem os dados de seleção
+            if (array_key_exists('values', $post)) {
+
+                # valida se @post>values não possui elementos arrays
+                if (!is_array($post['values'])){
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['error'][$return['error']['length']]['type'] = 'O conteúdo de values esta incompatível, era esperado arrays com dados para atualização';
+
+                    # adiciona +1 em $return>error>length
+                    $return['error']['length']++;
+                }
+            }
+
+            # valida se não existe em @post a arary values, que deve conter todos os dados
+            if (!array_key_exists('values', $post)){
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Não existe o grupo values que contem os valores de atualização da tabela';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+            }
+
+            # valida os campos não configuraveis internamente
+            # #
+
+
+            # # 
+            # valida os campos que podem ser reconfigurados conforme um padrão
+
+            # valida se não existe "regra" em @post, deve conter as configurações a mais
+            if (!array_key_exists('regra', $post)) {
+
+                # define @post>regra>relative como false
+                $post['regra']['relative'] = false;
+
+                # define @post>regra>order como false
+                $post['regra']['order'] = false;
+
+                # define @post>regra>limine com 1
+                $post['regra']['limit'] = "1";
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'Não foi passado nem um parametro regra, assim sendo definido todos com as configurações padrões ';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
+            }
+
+            # valida se existe "regra" em @post, deve conter as configurações a mais
+            if (array_key_exists('regra', $post)) {
+
+                # valida se não existe "relative" em @post>regra
+                if (!array_key_exists('relative', $post['regra'])) {
+
+                    # define @post>regra>relative como false
+                    $post['regra']['relative'] = false;
+
+
+                    # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['warning']['length']]['type'] = 'Não foi definido a regra para busca relativa ou especifica, assim por padrão ficando estabelecida como especifica';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+                }
+
+                # valida se não existe "order" em @post>regra, que deve conter as regras de ordenação
+                if (!array_key_exists('order', $post['regra'])) {
+
+                    # define @post>regra>order como false
+                    $post['regra']['order'] = false;
+
+
+                    # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado o parametro "order", assim defininco com sem ordenação para seleção';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+                }
+
+                # valida se existe "order" em @post>regra, que deve conter as regras de ordenação
+                if (array_key_exists('order', $post['regra'])) {
+
+                    # valida se não existe "to" em @post>regra>order, que identifica um campo para setar a ordem ede exibição
+                    if (!array_key_exists('to', $post['regra']['order'])) {
+
+                        # define @post>regra>order como false
+                        $post['regra']['order'] = false;
+
+
+                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para exibição';
+
+                        # adiciona +1 em $return>error>length
+                        $return['warning']['length']++;
+                    }
+
+                    # valida se não existe "by" em @post>regra>order, define se a ordem é acendente ou descendente
+                    if (!array_key_exists('by', $post['regra']['order'])) {
+
+                        # define @post>regra>order como false
+                        $post['regra']['order'] = false;
+
+
+                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para seleção';
+
+                        # adiciona +1 em $return>error>length
+                        $return['warning']['length']++;
+                    }
+                }
+
+                # valida se não existe "limit" em @post>regra, deve conter as regras de quantos itens a ser encontrados
+                if (!array_key_exists('limit', $post['regra'])) {
+
+                    # define @post>regra>limit como 1
+                    $post['regra']['limit'] = "1";
+
+
+                    # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['warning']['length']]['type'] = ' Não foi definido a regra para limite de impressão da busca do sql, assim sendo setada com limite igual a 1 (um)';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+                }
+
+                # valida se existe "limit" em @post>regra, deve conter as regras de quantos itens a ser encontrados 
+                if (array_key_exists('limit', $post['regra'])) {
+
+                    # padroniza o tamanho de @post>regra>limit caso seja menor que zero
+                    if ($post['regra']['limit'] <= 0) {
+
+                        # define @post>regra>limit com false
+                        $post['regra']['limit'] = false;
+                    }
+                }
+            }
+
+            # valida se não existe @post>return, contem a lista de campos a serem retornados
+            if (!array_key_exists('return', $post)) {
+
+                # adiciona em @post>regra a array como lista com valor 1
+                $post['return'] = array("*");
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'Não foi definido os campos a serem retornados, assim sendo setado com um retorno de todos os campos da tabela selecionada';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
+            }
+
+            # valida se existe @post>return, contem a lista de campos a serem retornados
+            if (array_key_exists('return', $post)) {
+
+                # valida se existe array em @post>return
+                if (is_array($post['return'])) {
+
+                    # valida se existe algo na posição zero, adiciona a contagen length
+                    if (array_key_exists('0', $post['return'])) {
+
+                        # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
+                        $post['return']['length'] = count($post['return']);
+                    }
+
+                    # valida se não existe algo na posição zero
+                    if (!array_key_exists('0', $post['return'])) {
+
+                        # define em @post>return com a função array_keys() os keys das arrays em lista numerica
+                        $post['return'] = array_keys($post['return']);
+
+                        # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
+                        $post['return']['length'] = count($post['return']);
+                    }
+                }
+
+                # valida se não existe array em @post>return
+                if (!is_array($post['return'])) {
+
+                    # valida se o conteudo de @post>return não é vazio
+                    if ($post['return'] != '') {
+
+                        # define array em @post>return na posição zero contendo @post>return
+                        $post['return'] = array($post['return']);
+
+                        # adiciona em @post>return>length o valor 1, referente a quantia de valores na posição
+                        $post['return']['length'] = 1;
+
+
+                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi definido nem um campo array para a seleção do banco, desta forma por padrão foi declarado na posição zero a string repassada';
+
+                        # adiciona +1 em $return>error>length
+                        $return['warning']['length'] = 1;
+                    }
+
+                    # valida se o conteudo de @post>return é vazio
+                    if ($post['return'] == '') {
+
+                        # adiciona em @return>error>[@~length]>type o um relato do que houve
+                        $return['error'][$return['error']['length']]['type'] = 'Não foi encontrado nem um valor referente a seleção para o banco, defina ao menos um ou apenas não declare esta propriedade';
+
+                        # adiciona +1 em $return>error>length
+                        $return['error']['length']++;
+                    }
+                }
+            }
+
+            # valida os campos que podem ser reconfigurados conforme um padrão
+            # # 
         }
         # caso @post>type seja do tipo "select"
         # # #

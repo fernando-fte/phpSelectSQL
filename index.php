@@ -192,6 +192,69 @@ unset($_POST);
 # # #
 
 # # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # #  UPDATE # # # # # # # # # # # # # # # 
+
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+$_POST =
+array(
+    'type' => 'update',
+    'table' => 'tabela',
+    'select' => array(
+        'segmento' => 'docentes',
+        'grupo' => 'professor',
+        'type' => 'Laurindo Furquim'
+    ),
+
+    'update' => array(
+        'values' => 'oi'
+    )
+);
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+
+# adiciona em @post os valores de _POST
+$post = $_POST;
+
+
+# # #
+# trata os parametros para a insersão no banco
+
+# adiciona em @temp>update>table o a tabela em @post
+$temp['update']['table'] = $post['table'];
+
+# adiciona em @temp>update>where os campos de redundanca de seleção
+$temp['update']['where'] = $post['select'];
+
+# adiciona em @temp>update>values os campos a serem atualizados
+$temp['update']['values'] = $post['update'];
+
+# adiciona em @temp>update>regra>order>to o campo de definição para ordenação da tabela MySQL
+$temp['update']['regra']['order']['to'] = 'index';
+
+# adiciona em @temp>update>regra>order>by o valor de ordenação "ASC|DESC"
+$temp['update']['regra']['order']['by'] = 'ASC';
+
+# adiciona em @temp>update>regra>limit o valor de limite de respostas como "2"
+$temp['update']['regra']['limit'] = '2';
+
+// # adiciona em @temp>update>values os campos de redundanca de seleção
+// $temp['update']['values'] = 'select';
+
+
+# adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
+$temp['resposta'] = update($temp['update'], true);
+
+# trata os parametros para a insersão no banco
+# # #
+
+# # # # # # # # # # # # # # #  UPDATE # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 ?>

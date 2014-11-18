@@ -1,5 +1,5 @@
 ﻿<?php
-# ini_set("display_errors", 0);
+ini_set("display_errors", 0);
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Inclui funções e regras pre-determinadas
@@ -105,6 +105,7 @@ function query($post, $print){
                     // $temp['connect']['result'] = mysql_query("DELETE FROM `tabela` WHERE `sku` LIKE '58f2f5cf4a'");
                     // $temp['connect']['result'] = mysql_query("UPDATE `tabela` SET `grupo` = 'b', `type` = 'b' WHERE `sku` = '58f2f5cf4a' LIMIT 1");
 
+
                     # valida se @temp>connect>result não conseguiu ser executado
                     if (mysql_error() != false) {
 
@@ -120,9 +121,15 @@ function query($post, $print){
 
                     # valida se @temp>connect>result conseguiu ser executado
                     if (mysql_error() == false) {
-
                         # adiciona em @retrun>result o resultado de @temp>connect>result
                         $return['result'] = $temp['connect']['result'];
+
+                        # verifica se existe algum valor retornado para insert
+                        if (mysql_insert_id()) {
+
+                            # define @reurn>result com o id da inserção em auto increment
+                            $return['result'] = mysql_insert_id();
+                        }
                     }
                 }
 
@@ -316,14 +323,14 @@ function select($post, $print){
         # define valores em @return>process>montagem para montagem
 
         # define @return>process>montagem>success com false, a espera de montagem
-        $return['process']['select']['success'] = false;
+        $return['process']['sql']['success'] = false;
 
         # define @return>process>montagem>error como NULL para sem erros
-        $return['process']['select']['error'] = null;
+        $return['process']['sql']['error'] = null;
 
 
         # define @return>process>montagem>warning como NULL para sem alertas
-        $return['process']['select']['warning'] = null;
+        $return['process']['sql']['warning'] = null;
         # # #
 
         # # configura os valores de retorno
@@ -522,15 +529,15 @@ function select($post, $print){
                 # adiciona +1 em $return>error>length
                 $return['error']['length']++;
 
-                # adiciona em @return>error>sql os valores de valida.
+                # adiciona em @return>sql os valores de valida.
                 $return['process']['sql']['error'] = $temp['select']['result'];
             }
 
             # verifica se o tratamento foi um successo, com @temp>select>success sendo falso
             if ($temp['select']['result']['success'] == true) {
 
-                # adiciona em @return>error>sql>success com verdadeiro.
-                $return['process']['select']['success'] = true;
+                # adiciona em @return>sql>success com verdadeiro.
+                $return['process']['sql']['success'] = true;
 
                 # verifica se existe algum alerta e adicioina a estrutura de @~sql
                 if ($temp['select']['result']['warning']['length'] > 0) {
@@ -542,13 +549,13 @@ function select($post, $print){
                     $return['warning']['length']++;
 
                     # adiciona os valores de @temp>select>warning em @return>warning>sql
-                    $return['process']['select']['warning'] = $temp['select']['result']['warning'];
+                    $return['process']['sql']['warning'] = $temp['select']['result']['warning'];
                 }
 
                 # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
                 $return['result']['length'] = mysql_num_rows($temp['select']['result']['result']);
 
-                # valida se @return>result>lenght é igual zero, para nem um valor retornado
+                # valida se @return>result>length é igual zero, para nem um valor retornado
                 if ($return['result']['length'] == 0) {
 
                     # adiciona em @return>result>length a contagem de campos selecionados na função mysql_num_rows()
@@ -565,7 +572,7 @@ function select($post, $print){
                     $return['warning']['length']++;
                 }
 
-                # valida se @return>result>lenght é igual a 1 ou maior que zero, para mais valores retornados
+                # valida se @return>result>length é igual a 1 ou maior que zero, para mais valores retornados
                 if ($return['result']['length'] > 0) {
 
                     # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
@@ -578,7 +585,7 @@ function select($post, $print){
                     $return['result']['labels']['length'] = count($return['result']['labels']);
                 }
 
-                # valida se @return>result>lenght é maior que 1, para mais valores retornados
+                # valida se @return>result>length é maior que 1, para mais valores retornados
                 if ($return['result']['length'] > 1) {
 
                     # adiciona em @temp>select>count o valor de 1 para o contador
@@ -651,6 +658,366 @@ function select($post, $print){
 # # # # # # # # # # #
 
 # # # # # # # # # # #
+# Função: trata os valores para a função select ao banco mysql
+function insert($post, $print){
+
+    # # # # #
+    # # configura os valores de retorno
+
+    # adiciona em @return>success com true, para iniciar as validações
+    $return['success'] = true;
+
+    # adiciona em @return>error>length o valor 0
+    $return['error']['length'] = 0;
+
+    # adiciona em @return>warning>length o valor 0
+    $return['warning']['length'] = 0;
+
+    # adiciona em @return>backup os valores de @post
+    # $return['backup'] = $post;
+
+    # define @return>process
+
+    # # configura os valores de retorno
+    # # # # #
+
+
+    # # # # #
+    # # valida os valores recebidos em @post
+
+    # declara @post>type como insert
+    $post['type'] = 'insert';
+
+    # adiciona em @temp>valida o valor recebido da função trata_query
+    $temp['valida'] = trata_query($post, false);
+
+    # verifica se houve algum problema no tratamento, com @temp>valida>successs sendo falso
+    if ($temp['valida']['success'] == false) {
+
+        # adiciona em @return>success com false, para abortar as validações
+        $return['success'] = false;
+
+        # adiciona em @return>error>[@~length]>type o um relato do que houve
+        $return['error'][$return['error']['length']]['type'] = 'Houve algum erro na manipulação dos conteudos no momento da validação, consulte a lista de erros de "trata_query"';
+
+        # adiciona +1 em $return>error>length
+        $return['error']['length']++;
+
+        # adiciona em @return>error>trata_query os valores de valida.
+        $return['process']['trata_query']['error'] = $temp['valida'];
+    }
+
+    # verifica se o tratamento foi um successo, com @temp>valida>success sendo falso
+    if ($temp['valida']['success'] == true) {
+
+        # define @post com os valores recebidos em @temp>valida>result
+        $post = $temp['valida']['result'];
+
+
+        # adiciona em @return>error>trata_query>success com verdadeiro.
+        $return['process']['trata_query']['success'] = true;
+
+        # verifica se existe algum alerta e adicioina a estrutura de @~trata_query
+        if ($temp['valida']['warning']['length'] > 0) {
+
+            # adiciona em @return>error>[@~length]>type o um relato do que houve
+            $return['warning'][$return['error']['length']]['type'] = 'Algo não saiu como esperado e houve alguns alertas no processo "trata_query"';
+
+            # adiciona +1 em $return>error>length
+            $return['warning']['length']++;
+
+            # adiciona os valores de @temp>valida>warning em @return>warning>trata_query
+            $return['process']['trata_query']['warning'] = $temp['valida']['warning'];
+        }
+    }
+
+    # apaga @temp>valida
+    unset($temp['valida']);
+
+    # # valida os valores recebidos em @post
+    # # # # #
+
+
+    # # # # #
+    # # inicia tratamento dos valores recebidos
+
+    # caso @return>success seja valido inicia a aplicação
+    if ($return['success'] == true) {
+
+        # # # # #
+        # # configura os valores de retorno
+
+        # # #
+        # define valores em @return>process>montagem para montagem
+
+        # define @return>process>montagem>success com false, a espera de montagem
+        $return['process']['montagem']['success'] = false;
+
+        # define @return>process>montagem>error como NULL para sem erros
+        $return['process']['montagem']['error'] = null;
+
+        # define @return>process>montagem>warning como NULL para sem alertas
+        $return['process']['montagem']['warning'] = null;
+
+        # # #
+
+        # #
+        # define valores em @return>process>montagem para montagem
+
+        # define @return>process>montagem>success com false, a espera de montagem
+        $return['process']['insert']['success'] = false;
+
+        # define @return>process>montagem>error como NULL para sem erros
+        $return['process']['insert']['error'] = null;
+
+        # define @return>process>montagem>warning como NULL para sem alertas
+        $return['process']['insert']['warning'] = null;
+        # # #
+
+        # # configura os valores de retorno
+        # # # # #
+
+
+        # # # # #
+        # Inicia montagem dos valores para "INSERT"
+
+        # valida @return>process>montagem>success é "false", inicia montagem de select
+        if ($return['process']['montagem']['success'] == false) {
+
+            # declara em @temp>montagem>sql o inicio dos parametros de syntax de seleção tipo "INSERT" para o MySQL
+            $temp['montagem']['sql'] = 'INSERT INTO ';
+
+
+            # # # #
+            # # tratamento para "TABLE"
+
+            # adiciona em @temp>montagem>sql o o parametro para tabela
+            $temp['montagem']['sql'] .= '`'.$post['table'].'` ';
+
+            # # tratamento para "TABLE"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "FIELDS"
+
+            # valida se existe apenas um campo para insersão, de acordo com as repostas em @post>length
+            if ($post['length'] == 1) {
+
+                # adiciona em @temp>montagem>sql o parametro responsavel pelo campo da tabela
+                $temp['montagem']['sql'] .= '(`'.$post['field']['0'].'`) ';
+            }
+
+            # valida se existe mais de um campo para insersão, de acordo com as repostas em @post>length
+            if ($post['length'] > 1) {
+
+                # adiciona em @temp>montagem>sql a abertura do parametro para os campos da tabela
+                $temp['montagem']['sql'] .= '(';
+
+                # adiciona @temp>montagem>select>count com valor 0
+                $temp['montagem']['field']['count'] = 0;
+
+                # inicia loop para capturar cada valor dos campo
+                while ($temp['montagem']['field']['count'] < $post['length']) {
+
+                    # valida se o loop está no inicio
+                    if ($temp['montagem']['field']['count'] == 0) {
+
+                        # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                        $temp['montagem']['sql'] .= '`'.$post['field'][$temp['montagem']['field']['count']].'`';
+                    }
+
+                    # valida se o loop não está no inicio
+                    if ($temp['montagem']['field']['count'] > 0) {
+
+                        # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                        $temp['montagem']['sql'] .= ', `'.$post['field'][$temp['montagem']['field']['count']].'`';
+                    }
+
+                    # adiciona +1 em $temp>montagem>field>count
+                    $temp['montagem']['field']['count']++;
+                }
+
+                # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                $temp['montagem']['sql'] .= ') ';
+            }
+
+            # # tratamento para "FIELDS"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "VALUES"
+
+            # declara em @temp>montagem>sql a entrada para os valores
+            $temp['montagem']['sql'] .= 'VALUES ';
+
+            # valida se existe apenas um valor para insersão, de acordo com as repostas em @post>length
+            if ($post['length'] == 1) {
+
+                # adiciona em @temp>montagem>sql o parametro responsavel pelo campo da tabela
+                $temp['montagem']['sql'] .= '(`'.$post['values']['0'].'`) ';
+            }
+
+            # valida se existe mais de um valor para insersão, de acordo com as repostas em @post>length
+            if ($post['length'] > 1) {
+
+                # adiciona em @temp>montagem>sql a abertura do parametro para os campos da tabela
+                $temp['montagem']['sql'] .= '(';
+
+                # adiciona @temp>montagem>select>count com valor 0
+                $temp['montagem']['values']['count'] = 0;
+
+                # inicia loop para capturar cada valor dos campo
+                while ($temp['montagem']['values']['count'] < $post['length']) {
+
+                    # valida se o loop está no inicio
+                    if ($temp['montagem']['values']['count'] == 0) {
+
+                        # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                        $temp['montagem']['sql'] .= '\''.$post['values'][$temp['montagem']['values']['count']].'\'';
+                    }
+
+                    # valida se o loop não está no inicio
+                    if ($temp['montagem']['values']['count'] > 0) {
+
+                        # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                        $temp['montagem']['sql'] .= ', \''.$post['values'][$temp['montagem']['values']['count']].'\'';
+                    }
+
+                    # adiciona +1 em $temp>montagem>values>count
+                    $temp['montagem']['values']['count']++;
+                }
+
+                # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
+                $temp['montagem']['sql'] .= ') ';
+            }
+
+            # # tratamento para "VALUES"
+            # # # #
+
+
+            # # # #
+            # # finaliza tratamentos
+
+            # define @return>process>montagem>success como "true", para concluido
+            $return['process']['montagem']['success'] = true;
+
+            # adiciona em @return>process>montagem>result o valor de @temp>montagem>sql
+            $return['process']['montagem']['result'] = $temp['montagem']['sql'];
+
+            # apaga @temp>montagem
+            unset($temp['montagem']);
+
+            # # finaliza tratamentos
+            # # # #
+        }
+
+        # Inicia montagem dos valores para "INSERT"
+        # # # # #
+
+
+        # # # # #
+        # # Inicia envio para o MySQL os valores para insert
+
+        # valida @return>process>montagem>success é "true" para o tratamento dos parametros "SELECT"
+        if ($return['process']['montagem']['success'] == true) {
+
+            # adiciona em @temp>select>sql o valor do resultado em @return>montagem>result
+            $temp['select']['sql'] = $return['process']['montagem']['result'];
+
+            # adiciona a propriedade "query" em @temp>select>type
+            $temp['select']['type'] = 'query';
+
+            # adiciona em @temp>select>result as respostas do servidor e define impressão como falsa
+            $temp['select']['result'] = query($temp['select'], false);
+
+
+            # verifica se houve algum problema no tratamento, com @temp>select>successs sendo falso
+            if ($temp['select']['result']['success'] == false) {
+
+                # adiciona em @return>success com false, para abortar as validações
+                $return['success'] = false;
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Houve algum erro na solicitação dos conteudos ao banco de dados, consulte a lista de erros do processo "sql"';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+
+                # adiciona em @return>sql>error os valores de valida.
+                $return['process']['sql']['error'] = $temp['select']['result'];
+            }
+
+            # verifica se o tratamento foi um successo, com @temp>select>success sendo falso
+            if ($temp['select']['result']['success'] == true) {
+
+                # adiciona em @return>process>sql>success com verdadeiro.
+                $return['process']['sql']['success'] = true;
+
+                # adiciona em @return>result o valor da inserção
+                $return['result'] = $temp['select']['result']['result'];
+
+                # verifica se existe algum alerta e adicioina a estrutura de @~sql
+                if ($temp['select']['result']['warning']['length'] > 0) {
+
+                    # adiciona em @return>error>[@~length]>type o um relato do que houve
+                    $return['warning'][$return['error']['length']]['type'] = 'Algo não saiu como esperado e houve alguns alertas no processo "select"';
+
+                    # adiciona +1 em $return>error>length
+                    $return['warning']['length']++;
+
+                    # adiciona os valores de @temp>select>warning em @return>warning>sql
+                    $return['process']['sql']['warning'] = $temp['select']['result']['warning'];
+                }
+            }
+        }
+
+        # # Inicia envio para o MySQL os valores para insert
+        # # # # #
+
+    }
+
+    # # inicia tratamento dos valores recebidos
+    # # # # #
+
+
+    # # # # #
+    # # Finializa validação
+
+    # valida se @return>error>length é maior que 0
+    if ($return['error']['length'] > 0) {
+
+        # adiciona em @return>success com bolean:false
+        $return['success'] = false;
+    }
+    # # Finializa validação
+    # # # # #
+
+
+    # # # # # # # # #
+    # # Finaliza exibindo o resultado
+    # caso @print seja verdadeiro, exibe return
+    if($print == true){
+
+        # imprime na tela os valores de #return
+        print_r($return);
+    }
+
+    # caso @print seja falso apenas retorna o valor
+    if($print == false){
+
+        # retorna o valor de @return
+        return $return;
+    }
+    # # Finaliza exibindo o resultado
+    # # # # # # # # #
+}
+# Função: trata os valores para a função select ao banco mysql
+# # # # # # # # # # #
+
+
+# # # # # # # # # # #
 # Função: valida valores arrays e restrurura
 function trata_query($post, $print){
 
@@ -699,7 +1066,7 @@ function trata_query($post, $print){
         # # #
         # caso @post>type seja do tipo "select"
         if ($post['type'] == 'select') {
-            
+
             # #
             # valida os campos não configuraveis internamente
 
@@ -873,7 +1240,7 @@ function trata_query($post, $print){
                 # valida se existe array em @post>return
                 if (is_array($post['return'])) {
 
-                    # valida se existe algo na posição zero, adiciona a contagen lenght
+                    # valida se existe algo na posição zero, adiciona a contagen length
                     if (array_key_exists('0', $post['return'])) {
 
                         # adiciona em @post>return>length o valor da função count(), referente a quantia de valores na posição
@@ -942,10 +1309,107 @@ function trata_query($post, $print){
         # # #
         # caso @post>type seja do tipo "select"
         else if ($post['type'] == 'insert') {
-            
-            # inicia validação conforme os valore
+
+            # # # # #
+            # # configura os valores de retorno interno
+
+            # define @temp>insert>error com 0
+            $temp['insert']['error'] = 0;
+
+            # # configura os valores de retorno interno
+            # # # # #
+
+
+            # #
+            # valida os campos não configuraveis internamente
+
+            # valida se não existe em @post a arary values, que deve conter todos os dados
+            if (!array_key_exists('values', $post)) {
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Não foi encontrado nem um campo a ser inserido, é necessario ao menos setar um campo para que seja inserido';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+            }
+
+            # valida se existe em @post a arary values, que deve conter todos os dados
+            if (array_key_exists('values', $post)) {
+
+                # valida se não foi recebido um conjunto de arrays de @post>values
+                if (!is_array($post['values'])) {
+
+                    # valida se a string recebida de @post>values não é vazia
+                    if ($post['values'] != '') {
+
+                        # adiciona em @temp>result>field na posição 0 o valor da chave equivalente a coluna da tabela
+                        $temp['result']['field']['0'] = $post['values'];
+
+                        # adiciona em @temp>result>val na posição 0 o valor a ser inserido na coluna em @~field
+                        $temp['result']['values']['0'] = null;
+
+                        # adiciona em @temp>values>length a quantidade de valores a serem inseridos com a função count
+                        $temp['result']['length'] = count($temp['result']['field']);
+
+
+                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi passado nem um parametro array, assim será pego o valor string e definido como campo, com valor "NULL"';
+
+                        # adiciona +1 em $return>error>length
+                        $return['warning']['length']++;
+                    }
+
+                    # valida se a string recebida de @post>values é vazia
+                    if ($post['values'] == '') {
+
+                        # adiciona +1 em @temp>insert>error
+                        $temp['insert']['error']++;
+
+                        # adiciona em @return>error>[@~length]>type o um relato do que houve
+                        $return['error'][$return['error']['length']]['type'] = 'Não foi encontrado nada no campo definido como values';
+
+                        # adiciona +1 em $return>error>length
+                        $return['error']['length']++;
+                    }
+                }
+
+                # valida se foi recebido um conjunto de arrays de @post>values
+                if (is_array($post['values'])) {
+
+                    # explode os campos de @post>values em @return>result>field
+                    $temp['result']['field'] = array_keys($post['values']);
+
+                    # explode os valores de @post>values em @temp>result>valores
+                    $temp['result']['values'] = array_values($post['values']);
+
+                    # adiciona em @temp>values>length a quantidade de valores a serem inseridos com a função count
+                    $temp['result']['length'] = count($temp['result']['field']);
+                }
+
+                # valida se houve algum erro em @post>values, para definir os dados de resposta
+                if ($return['error']['length'] == 0) {
+
+                    # apaga os valores de @post>values, para serem redefinidos
+                    unset($post['values']);
+
+                    # adiciona em @post>length para a quantidade de resultados
+                    $post['length'] = $temp['result']['length'];
+
+                    # adiciona em @post>field os campos da tabela a ser seelcionado
+                    $post['field'] = $temp['result']['field'];
+
+                    # adiciona em @post>values os valores de cada campo a ser inserido
+                    $post['values'] = $temp['result']['values'];
+                }
+            }
+
+            # apaga os valores de @temp
+            unset($temp);
+
+            # valida os campos não configuraveis internamente
+            # #
         }
-        # caso @post>type seja do tipo "select"
+        # caso @post>type seja do tipo "insert"
         # # #
 
         # # #

@@ -99,10 +99,9 @@ array(
     'type' => 'insert',
     'table' => 'tabela',
     'select' => array(
-        'segmento' => 'galeria',
-        // 'segmento' => 'docentes',
-        // 'grupo' => 'professor',
-        // 'type' => 'Laurindo Furquim'
+        'segmento' => 'docentes',
+        'grupo' => 'professor',
+        'type' => 'Laurindo Furquim'
     )
 );
 /**
@@ -116,6 +115,7 @@ $post = $_POST;
 # # #
 # trata dados de @post, de acordo com a estrutura do banco
 
+# configurações de capturação de dados do banco
 $temp['insert']['select']['regra']['limit'] = '1';
 $temp['insert']['select']['regra']['order']['to'] = 'index';
 $temp['insert']['select']['regra']['order']['by'] = 'DESC';
@@ -123,12 +123,13 @@ $temp['insert']['select']['where'] = $post['select'];
 $temp['insert']['select']['table'] = $post['table'];
 $temp['insert']['select']['return'] = 'index';
 $temp['insert']['select']['change'] = select($temp['insert']['select'], false);
+# configurações de capturação de dados do banco
 
 # valida se não foi encontrado nem resultado
 if ($temp['insert']['select']['change']['result']['length'] == 0) {
 
     # adiciona em @post>select>index o valor para index
-    $post['select']['index'] = 0;
+    $post['select']['index'] = 1;
 }
 
 # valida se foi encontrado algum resultado
@@ -138,32 +139,57 @@ if ($temp['insert']['select']['change']['result']['length'] > 0) {
     $post['select']['index'] = $temp['insert']['select']['change']['result']['0']['index']+1;
 }
 
+# fixa data atual
+$temp['insert']['select']['date'] = date('Y-m-d h:i:s');
+
+# cria MD5 para o valor atual
+$temp['insert']['select']['sku'] = md5($post['select']['index'] . $post['select']['segmento'] . $post['select']['grupo'] . $post['select']['type'] . $temp['insert']['select']['date']);
+
+# adiciona em @post>select>sku o resulado do md5 com 10 caracteres
+$post['select']['sku'] = substr($temp['insert']['select']['sku'], 0, 5) . substr($temp['insert']['select']['sku'], -5);
+
+# apaga @temp>insert>select
+unset($temp['insert']['select']);
 
 # trata dados de @post, de acordo com a estrutura do banco
 # # #
-
-
 
 
 # # #
 # trata os parametros para a insersão no banco
 
 # adiciona em @temp>insert>table o a tabela em @post
-// $temp['insert']['table'] = $post['table'];
+$temp['insert']['table'] = $post['table'];
 
 # adiciona em @temp>insert>values os campos de redundanca de seleção
-// $temp['insert']['values'] = $post['select'];
+$temp['insert']['values'] = $post['select'];
+
+// # adiciona em @temp>insert>values os campos de redundanca de seleção
+// $temp['insert']['values'] = 'select';
 
 # trata os parametros para a insersão no banco
 # # #
 
 # adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
-// $temp['resposta'] = insert($temp['insert'], true);
+$temp['resposta'] = insert($temp['insert'], false);
+
+
+# # #
+# apaga itens usados na manipulação
+
+# apaga @temp
+unset($temp);
+
+# apara @post
+unset($post);
+
+# apara _POST
+unset($_POST);
+
+# apaga itens usados na manipulação
+# # #
 
 # # # # # # # # # # # # # # #  INSERT # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-
-
 
 ?>

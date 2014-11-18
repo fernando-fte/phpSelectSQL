@@ -173,6 +173,8 @@ $temp['insert']['values'] = $post['select'];
 # adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
 $temp['resposta'] = insert($temp['insert'], false);
 
+# trata os parametros para a insersão no banco
+# # #
 
 # # #
 # apaga itens usados na manipulação

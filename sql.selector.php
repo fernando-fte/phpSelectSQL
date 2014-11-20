@@ -472,8 +472,12 @@ function select($post, $print){
             # # # #
             # # tratamento para "LIMITE"
 
-            # adiciona em @temp>montagem>sql o o parametro para "LIMIT" em @post>regra>limit
-            $temp['montagem']['sql'] .= 'LIMIT '.$post['regra']['limit'];
+            # valida se existe limite em @post>regra>limit
+            if ($post['regra']['limit'] != false) {
+
+                # adiciona em @temp>montagem>sql o o parametro para "LIMIT" em @post>regra>limit
+                $temp['montagem']['sql'] .= 'LIMIT '.$post['regra']['limit'];
+            }
 
             # # tratamento para "LIMITE"
             # # # #
@@ -1094,14 +1098,6 @@ function update($post, $print){
     # # valida os valores recebidos em @post
     # # # # #
 
-/**
-UPDATE `tabela` 
-SET `grupo` = 'b', `type` = 'b' 
-WHERE `sku` = '58f2f5cf4a' 
-ORDER BY 
-LIMIT 1
-**/
-
 
     # # # # #
     # # inicia tratamento dos valores recebidos
@@ -1130,13 +1126,13 @@ LIMIT 1
         # define valores em @return>process>montagem para montagem
 
         # define @return>process>montagem>success com false, a espera de montagem
-        $return['process']['insert']['success'] = false;
+        $return['process']['sql']['success'] = false;
 
         # define @return>process>montagem>error como NULL para sem erros
-        $return['process']['insert']['error'] = null;
+        $return['process']['sql']['error'] = null;
 
         # define @return>process>montagem>warning como NULL para sem alertas
-        $return['process']['insert']['warning'] = null;
+        $return['process']['sql']['warning'] = null;
         # # #
 
         # # configura os valores de retorno
@@ -1144,28 +1140,215 @@ LIMIT 1
 
 
         # # # # #
-        # Inicia montagem dos valores para "INSERT"
+        # Inicia montagem dos valores para "sql"
 
         # valida @return>process>montagem>success é "false", inicia montagem de select
         if ($return['process']['montagem']['success'] == false) {
 
+            # declara em @temp>montagem>sql o inicio dos parametros de syntax de seleção tipo "UPDATE" para o MySQL
+            $temp['montagem']['sql'] = 'UPDATE ';
+
+
+            # # # #
+            # # tratamento para "TABLE"
+
+            # adiciona em @temp>montagem>sql o o parametro para tabela
+            $temp['montagem']['sql'] .= '`'.$post['table'].'` ';
+
+            # # tratamento para "TABLE"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "SET"
+
+            # adiciona @temp>montagem>select>count com valor 0
+            $temp['montagem']['set']['count'] = 0;
+
+            # desmonta os valores de @post>where para @temp>montagem>where key e val
+            foreach ($post['values'] as $temp['montagem']['set']['key'] => $temp['montagem']['set']['val']) {
+
+                # verifica se @temp>montagem>select>count esta na primeira sequencia de chave
+                if ($temp['montagem']['set']['count'] == 0) {
+
+                    # adiciona em @temp>montagem>sql a abertura da solicitação do tipo set
+                    $temp['montagem']['sql'] .= 'SET ';
+                }
+
+                # verifica se @temp>montagem>select>count passou da primeira sequencia de chave
+                if ($temp['montagem']['set']['count'] > 0) {
+
+                    # adiciona em @temp>montagem>sql a abertura de uma sequencia com (,)
+                    $temp['montagem']['sql'] .= ', ';
+                }
+
+                # adiciona em @temp>montagem>sql o valor de @post>set para coluna de "UPDATE set"
+                $temp['montagem']['sql'] .= '`'. $temp['montagem']['set']['key'].'`';
+
+                # adiciona em @temp>montagem>sql o valor de @post>set para coluna de "SELECT LIKE", para valores relativos
+                $temp['montagem']['sql'] .= ' = \''.$temp['montagem']['set']['val'].'\'';
+
+                # adiciona +1 no contador de @temp>montagem>select>count
+                $temp['montagem']['set']['count']++;
+            }
+
+            # adiciona um espaço ao final de @temp>montagem>sql, para separar a sessão
+            $temp['montagem']['sql'] .= ' ';
+
+            # apaga @temp>montagem>set
+            unset($temp['montagem']['set']);
+
+            # # tratamento para "SET"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "WHERE"
+
+            # adiciona @temp>montagem>select>count com valor 0
+            $temp['montagem']['where']['count'] = 0;
+
+            # desmonta os valores de @post>where para @temp>montagem>where key e val
+            foreach ($post['where'] as $temp['montagem']['where']['key'] => $temp['montagem']['where']['val']) {
+
+                # verifica se @temp>montagem>select>count esta na primeira sequencia de chave
+                if ($temp['montagem']['where']['count'] == 0) {
+
+                    # adiciona em @temp>montagem>sql a abertura da solicitação do tipo WHERE
+                    $temp['montagem']['sql'] .= 'WHERE ';
+                }
+
+                # verifica se @temp>montagem>select>count passou da primeira sequencia de chave
+                if ($temp['montagem']['where']['count'] > 0) {
+
+                    # adiciona em @temp>montagem>sql a abertura da solicitação do tipo AND
+                    $temp['montagem']['sql'] .= 'AND ';
+                }
+
+                # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT WHERE"
+                $temp['montagem']['sql'] .= '`'. $temp['montagem']['where']['key'].'`';
+
+                # valida se o @post>regra>relative é verdadero pra valor relativo
+                if ($post['regra']['relative'] == true) {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores relativos
+                    $temp['montagem']['sql'] .= ' LIKE \'%'.$temp['montagem']['where']['val'].'%\' ';
+                }
+
+                # valida se o @post>regra>relative é falso pra valor relativo, e verdadeiro para especifico
+                if ($post['regra']['relative'] == false) {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores especificos
+                    $temp['montagem']['sql'] .= ' LIKE \''.$temp['montagem']['where']['val'].'\' ';
+                }
+
+                # adiciona +1 no contador de @temp>montagem>select>count
+                $temp['montagem']['where']['count']++;
+            }
+
+            # apaga @temp>montagem>where
+            unset($temp['montagem']['where']);
+
+            # # tratamento para "WHERE"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "ORDER"
+
+            # valida se @post>regra>order não é falso
+            if ($post['regra']['order'] != false) {
+
+                # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a coluna
+                $temp['montagem']['sql'] .= 'ORDER BY `'.$post['regra']['order']['to'].'` ';
+
+                # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a ordem
+                $temp['montagem']['sql'] .= $post['regra']['order']['by'].' ';
+            }
+
+            # # tratamento para "ORDER"
+            # # # #
+
+
+            # # # #
+            # # tratamento para "LIMITE"
+
+            # valida se existe limite em @post>regra>limit
+            if ($post['regra']['limit'] != false) {
+
+                # adiciona em @temp>montagem>sql o o parametro para "LIMIT" em @post>regra>limit
+                $temp['montagem']['sql'] .= 'LIMIT '.$post['regra']['limit'];
+            }
+
+            # # tratamento para "LIMITE"
+            # # # #
+
+
+            # # # #
+            # # finaliza tratamentos
+
+            # define @return>process>montagem>success como "true", para concluido
+            $return['process']['montagem']['success'] = true;
+
+            # adiciona em @return>process>montagem>result o valor de @temp>montagem>sql
+            $return['process']['montagem']['result'] = $temp['montagem']['sql'];
+
+            # apaga @temp>montagem
+            unset($temp['montagem']);
+
+            # # finaliza tratamentos
+            # # # #
         }
 
-        # Inicia montagem dos valores para "INSERT"
+        # Inicia montagem dos valores para "sql"
         # # # # #
 
 
         # # # # #
-        # # Inicia envio para o MySQL os valores para insert
+        # # Inicia envio para o MySQL os valores para sql
 
         # valida @return>process>montagem>success é "true" para o tratamento dos parametros "SELECT"
         if ($return['process']['montagem']['success'] == true) {
 
+            # adiciona em @temp>select>sql o valor do resultado em @return>montagem>result
+            $temp['select']['sql'] = $return['process']['montagem']['result'];
+
+            # adiciona a propriedade "query" em @temp>select>type
+            $temp['select']['type'] = 'query';
+
+            # adiciona em @temp>select>result as respostas do servidor e define impressão como falsa
+            $temp['select']['result'] = query($temp['select'], false);
+
+
+            # verifica se houve algum problema no tratamento, com @temp>select>successs sendo falso
+            if ($temp['select']['result']['success'] == false) {
+
+                # adiciona em @return>success com false, para abortar as validações
+                $return['success'] = false;
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Houve algum erro na solicitação dos conteudos ao banco de dados, consulte a lista de erros do processo "sql"';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+
+                # adiciona em @return>sql os valores de valida.
+                $return['process']['sql']['error'] = $temp['select']['result'];
+            }
+
+            # verifica se o tratamento foi um successo, com @temp>select>success sendo falso
+            if ($temp['select']['result']['success'] == true) {
+
+                # adiciona em @return>result o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
+                $return['result'] = $temp['select']['result']['result'];
+
+                # adiciona em @return>sql>success com verdadeiro.
+                $return['process']['sql']['success'] = true;
+            }
         }
 
-        # # Inicia envio para o MySQL os valores para insert
+        # # Inicia envio para o MySQL os valores para sql
         # # # # #
-
     }
 
     # # inicia tratamento dos valores recebidos

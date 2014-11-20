@@ -212,7 +212,7 @@ array(
     ),
 
     'update' => array(
-        'values' => 'oi'
+        'values' => 'vai lá'
     )
 );
 /**
@@ -242,7 +242,7 @@ $temp['update']['regra']['order']['to'] = 'index';
 $temp['update']['regra']['order']['by'] = 'ASC';
 
 # adiciona em @temp>update>regra>limit o valor de limite de respostas como "2"
-$temp['update']['regra']['limit'] = '2';
+$temp['update']['regra']['limit'] = '1';
 
 // # adiciona em @temp>update>values os campos de redundanca de seleção
 // $temp['update']['values'] = 'select';

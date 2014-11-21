@@ -249,12 +249,80 @@ $temp['update']['regra']['limit'] = '1';
 
 
 # adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
-$temp['resposta'] = update($temp['update'], true);
+$temp['resposta'] = update($temp['update'], false);
 
 # trata os parametros para a insersão no banco
 # # #
 
+
+# # #
+# apaga itens usados na manipulação
+
+# apaga @temp
+unset($temp);
+
+# apara @post
+unset($post);
+
+# apara _POST
+unset($_POST);
+
+# apaga itens usados na manipulação
+# # #
+
 # # # # # # # # # # # # # # #  UPDATE # # # # # # # # # # # # # # # 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # #  DELETE # # # # # # # # # # # # # # # 
+
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+$_POST =
+array(
+    'type' => 'delete',
+    'table' => 'tabela',
+    'select' => array(
+        'type' => 'Laurindo Furquim'
+    )
+);
+/**
+// modelo de informações mínimas vindas por $_POST para isersão do banco
+**/
+
+# adiciona em @post os valores de _POST
+$post = $_POST;
+
+
+# # #
+# trata os parametros para a insersão no banco
+
+# adiciona em @temp>delete>table o a tabela em @post
+$temp['delete']['table'] = $post['table'];
+
+# adiciona em @temp>delete>where os campos de redundanca de seleção
+$temp['delete']['where'] = $post['select'];
+
+# adiciona em @temp>delete>values os campos a serem atualizados
+$temp['delete']['values'] = $post['delete'];
+
+# adiciona em @temp>delete>regra>limit o valor de limite de respostas como "2"
+$temp['delete']['regra']['limit'] = 0;
+
+// # adiciona em @temp>delete>values os campos de redundanca de seleção
+// $temp['delete']['values'] = 'select';
+
+
+# adiciona em @temp>resposta os resultados da inserção baseado nos dados de @temp>insert
+$temp['resposta'] = delete($temp['delete'], false);
+
+# trata os parametros para a insersão no banco
+# # #
+
+# # # # # # # # # # # # # # #  DELETE # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 
 ?>

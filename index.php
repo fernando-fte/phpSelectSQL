@@ -63,6 +63,19 @@ $temp['select']['regra']['order']['by'] = 'ASC';
 # adiciona em @temp>select>regra>limit o valor de limite de respostas como "2"
 $temp['select']['regra']['limit'] = '2';
 
+
+# adiciona em $temp>select>connect>host o local do phpmyadmin
+$temp['select']['connect']['host'] = 'localhost'; 
+
+# adiciona em $temp>select>connect>host o usuario do servidor
+$temp['select']['connect']['user'] = 'root'; 
+
+# adiciona em $temp>select>connect>host a senha do servidor
+$temp['select']['connect']['pasword'] = ''; 
+
+# adiciona em $temp>select>connect>host o banco de dados
+$temp['select']['connect']['database'] = 'meubanco'; 
+
 # trata os parametros para chamada do banco
 # # #
 

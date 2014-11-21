@@ -1,24 +1,52 @@
 ﻿<?php
+
+# oculta erros do display
 ini_set("display_errors", 0);
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# Inclui funções e regras pre-determinadas
-#
-
-# inclui classe de conexão ao banco de dados
-include 'sql.connect.php';
-
-# inclui funções de tratamento e manipulação para conexão do banco de dados
-# include 'sql.selector1.php';
-
-#
-# Fim de "Inclui funções e regras pre-determinadas"
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
 # # # # # # # # # # #
 # Função: solicita ao MySQL os valores conforme os parametros
 function query($post, $print){
+
+    # # # # #
+    /**
+    # CONFIGURAÇÃO DE CONEXÃO COM O SERVIDOR
+    **/
+
+    # configura local do phpmyadmin
+    $temp['connect']['host'] = 'localhost'; 
+    
+    # usuario do servidor
+    $temp['connect']['user'] = 'root'; 
+
+    # senha do servidor
+    $temp['connect']['pasword'] = ''; 
+
+    # banco de dados
+    $temp['connect']['database'] = 'meubanco'; 
+
+    /**
+    # CONFIGURAÇÃO DE CONEXÃO COM O SERVIDOR
+    **/
+    # # # # #
+
+
+    # # # # #
+    # inicia validação para configurações de conexão
+
+    # caso não exista connect em @post
+    if (!array_key_exists('connect', $post)) {
+
+        # adiciona em @connect o valore de @temp>connect
+       $connect = $temp['connect'];
+    }
+
+    # apaga @temp>connect
+    unset($temp['connect']);
+
+    # inicia validação para configurações de conexão
+    # # # # #
+
 
     # # # # #
     # # configura os valores de retorno
@@ -61,7 +89,7 @@ function query($post, $print){
         if ($post['type'] == 'query') {
 
             # adiciona em @temp>connect>mysql os dados de conexão do servidor MySQL
-            $temp['connect']['mysql'] = mysql_connect('localhost', 'root', '');
+            $temp['connect']['mysql'] = mysql_connect($connect['host'], $connect['user'], $connect['pasword']);
 
             # valida se @temp>connect>msyql não estabeleceu conexão
             if (mysql_error() != false) {
@@ -77,7 +105,7 @@ function query($post, $print){
             if (mysql_error() == false) {
 
                 # adiciona em @temp>connect>banco a conxão com o banco
-                $temp['connect']['banco'] = mysql_select_db('meubanco', $temp['connect']['mysql']);
+                $temp['connect']['banco'] = mysql_select_db($connect['database'], $temp['connect']['mysql']);
 
                 # valida se @temp>connect>banco não foi conectado ou encontrado
                 if (mysql_error() != false) {
@@ -2353,7 +2381,7 @@ function trata_query($post, $print){
 
         # # #
         # caso @post>type seja do tipo "delete"
-        if ($post['type'] == 'delete') {
+        else if ($post['type'] == 'delete') {
 
             # #
             # valida os campos não configuraveis internamente

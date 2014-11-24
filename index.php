@@ -82,6 +82,9 @@ $temp['select']['connect']['database'] = 'meubanco';
 # adiciona em @temp>resposta os valores recebidos da função select atravez dos parametros em @temp>select
 $temp['resposta'] = select($temp['select'], false);
 
+print_r($temp['resposta']['result']);
+
+
 # # #
 # apaga itens usados na manipulação
 

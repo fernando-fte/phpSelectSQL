@@ -14,16 +14,16 @@ function query($post, $print){
     **/
 
     # configura local do phpmyadmin
-    $temp['connect']['host'] = 'localhost'; 
+    $connect['host'] = 'localhost'; 
     
     # usuario do servidor
-    $temp['connect']['user'] = 'root'; 
+    $connect['user'] = 'root'; 
 
     # senha do servidor
-    $temp['connect']['pasword'] = ''; 
+    $connect['pasword'] = ''; 
 
     # banco de dados
-    $temp['connect']['database'] = 'meubanco'; 
+    $connect['database'] = 'meubanco'; 
 
     /**
     # CONFIGURAÇÃO DE CONEXÃO COM O SERVIDOR
@@ -32,19 +32,40 @@ function query($post, $print){
 
 
     # # # # #
-    # inicia validação para configurações de conexão
+    # inicia validação para configurações de conexão externas
 
-    # caso não exista connect em @post
+    # caso exista connect em @post
     if (!array_key_exists('connect', $post)) {
 
-        # adiciona em @connect o valore de @temp>connect
-       $connect = $temp['connect'];
+        # valida se existe @post>connect>host
+        if (!array_key_exists('connect', $post)) {
+
+            # valida se @post>connect>host não é vazio
+            if ($post['connect']['host'] != '') {
+
+                # define em @connect>host o valor vindo de @post>connect>host 
+                $connect['host'] = $post['connect']['host'];
+            }
+
+            # valida se @post>connect>host é vazio
+            if ($post['connect']['host'] != '') {
+
+                # define em @connect>host o valor default como "localhost"
+                $connect['host'] = 'localhost';
+
+
+                # adiciona erro warning para @post>connect>host vazio
+            }
+
+            # adiciona warning para a conexão host como validada por @post
+        }        
     }
+
 
     # apaga @temp>connect
     unset($temp['connect']);
 
-    # inicia validação para configurações de conexão
+    # inicia validação para configurações de conexão externas
     # # # # #
 
 

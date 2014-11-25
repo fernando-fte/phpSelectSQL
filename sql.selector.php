@@ -32,19 +32,26 @@ function query($post, $print){
 
 
     # # # # #
-    # inicia validação para configurações de conexão externas
+    # validação para configurações de conexão externas
 
     # caso exista connect em @post
-    if (!array_key_exists('connect', $post)) {
+    if (array_key_exists('connect', $post)) {
 
         # valida se existe @post>connect>host
-        if (!array_key_exists('connect', $post)) {
+        if (array_key_exists('host', $post['connect'])) {
 
             # valida se @post>connect>host não é vazio
             if ($post['connect']['host'] != '') {
 
                 # define em @connect>host o valor vindo de @post>connect>host 
                 $connect['host'] = $post['connect']['host'];
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'O parametro de conexão de banco de dados, para "host" foi definido manualmente';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
             }
 
             # valida se @post>connect>host é vazio
@@ -54,18 +61,94 @@ function query($post, $print){
                 $connect['host'] = 'localhost';
 
 
-                # adiciona erro warning para @post>connect>host vazio
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'Foi definido manualmente o parametro de conexão de banco de dados, para "host", porem nada foi encontrado, assim foi definido um valor "default"';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
             }
 
             # adiciona warning para a conexão host como validada por @post
-        }        
+        }
+
+        # valida se existe @post>connect>user
+        if (array_key_exists('user', $post['connect'])) {
+
+            # valida se @post>connect>user não é vazio
+            if ($post['connect']['user'] != '') {
+
+                # define em @connect>user o valor vindo de @post>connect>user 
+                $connect['user'] = $post['connect']['user'];
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'O parametro de conexão de banco de dados, para "user" foi definido manualmente';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
+            }
+
+            # valida se @post>connect>user é vazio
+            if ($post['connect']['user'] != '') {
+
+                # define em @connect>user o valor default como "localuser"
+                $connect['user'] = 'root';
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'Foi definido manualmente o parametro de conexão de banco de dados, para "user", porem nada foi encontrado, assim foi definido um valor "default"';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
+            }
+
+            # adiciona warning para a conexão user como validada por @post
+        }
+
+        # valida se existe @post>connect>pasword
+        if (array_key_exists('pasword', $post['connect'])) {
+
+            # define em @connect>pasword o valor vindo de @post>connect>pasword 
+            $connect['pasword'] = $post['connect']['pasword'];
+
+
+            # adiciona em @return>warning>[@~length]>type o um relato do que houve
+            $return['warning'][$return['warning']['length']]['type'] = 'O parametro de conexão de banco de dados, para "password" foi definido manualmente';
+
+            # adiciona +1 em $return>error>length
+            $return['warning']['length']++;
+        }
+
+        # valida se existe @post>connect>database
+        if (array_key_exists('database', $post['connect'])) {
+
+            # valida se @post>connect>database não é vazio
+            if ($post['connect']['database'] != '') {
+
+                # define em @connect>database o valor vindo de @post>connect>database 
+                $connect['database'] = $post['connect']['database'];
+
+
+                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                $return['warning'][$return['warning']['length']]['type'] = 'O parametro de conexão de banco de dados, para "databased" foi definido manualmente';
+
+                # adiciona +1 em $return>error>length
+                $return['warning']['length']++;
+            }
+
+            # valida se @post>connect>database é vazio
+            if ($post['connect']['database'] = '') {
+
+                # adiciona em @return>error>[@~length]>type o um relato do que houve
+                $return['error'][$return['error']['length']]['type'] = 'Não foi definido nem um banco de dados na solicitação manual';
+
+                # adiciona +1 em $return>error>length
+                $return['error']['length']++;
+            }
+        }
     }
 
-
-    # apaga @temp>connect
-    unset($temp['connect']);
-
-    # inicia validação para configurações de conexão externas
+    # validação para configurações de conexão externas
     # # # # #
 
 

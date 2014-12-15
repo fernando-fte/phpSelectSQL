@@ -8,28 +8,11 @@ ini_set("display_errors", 0);
 # Função: solicita ao MySQL os valores conforme os parametros
 function query($post, $print){
 
-    # # # # #
-    /**
-    # CONFIGURAÇÃO DE CONEXÃO COM O SERVIDOR
-    **/
-
-    # configura local do phpmyadmin
-    $connect['host'] = 'localhost'; 
-    
-    # usuario do servidor
-    $connect['user'] = 'root'; 
-
-    # senha do servidor
-    $connect['pasword'] = ''; 
-
-    # banco de dados
-    $connect['database'] = 'meubanco'; 
-
-    /**
-    # CONFIGURAÇÃO DE CONEXÃO COM O SERVIDOR
-    **/
-    # # # # #
-
+    # # # #
+    # Inclui as informações de conexão do valor
+    include '._.account.php';
+    # Inclui as informações de conexão do valor
+    # # # #
 
     # # # # #
     # validação para configurações de conexão externas
@@ -484,8 +467,19 @@ function select($post, $print){
             # valida se existe apenas um resultado em @post>return, adicionando apenas o valor entre aspas
             if ($post['return']['length'] == 1) {
 
-                # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, sem virgula com espaço ao final
-                $temp['montagem']['sql'] .= '`'. $post['return']['0'].'` ';
+                # valida se o retorno quando 1 for igual a "*", para selecionar todo o banco
+                if ($post['return']['0'] == '*') {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, sem virgula com espaço ao final
+                    $temp['montagem']['sql'] .= $post['return']['0'].' ';
+                }
+
+                # valida se o retorno quando 1 for igual a "*", para selecionar todo o banco
+                if ($post['return']['0'] != '*') {
+
+                    # adiciona em @temp>montagem>sql o valor de @post>return na posição atual, sem virgula com espaço ao final
+                    $temp['montagem']['sql'] .= '`'.$post['return']['0'].'` ';
+                }
             }
 
             # valida se existe mais de um resultado em @post>return, adicionando os valores sequenciados por virgula

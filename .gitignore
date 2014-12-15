@@ -8,6 +8,7 @@ _src?
 .DS_Store
 .DS_Store?
 ._*
+!._.*.php
 .Spotlight-V100
 .Trashes
 ehthumbs.db

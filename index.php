@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # Inclui funções e regras pre-determinadas
 #

@@ -1,5 +1,14 @@
 ﻿<?php
 
+/*
+*
+* @access protect
+* @copyright FERNANDO-FTE © 2014
+* @author Fernando Truculo Evangelista
+* @version 1.0
+*
+*/
+
 # oculta erros do display
 ini_set("display_errors", 0);
 
@@ -952,14 +961,14 @@ function insert($post, $print){
                     if ($temp['montagem']['field']['count'] == 0) {
 
                         # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
-                        $temp['montagem']['sql'] .= '`'.$post['field'][$temp['montagem']['field']['count']].'`';
+                        $temp['montagem']['sql'] .= '`'.addslashes($post['field'][$temp['montagem']['field']['count']]).'`';
                     }
 
                     # valida se o loop não está no inicio
                     if ($temp['montagem']['field']['count'] > 0) {
 
                         # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
-                        $temp['montagem']['sql'] .= ', `'.$post['field'][$temp['montagem']['field']['count']].'`';
+                        $temp['montagem']['sql'] .= ', `'.addslashes($post['field'][$temp['montagem']['field']['count']]).'`';
                     }
 
                     # adiciona +1 em $temp>montagem>field>count
@@ -1003,14 +1012,14 @@ function insert($post, $print){
                     if ($temp['montagem']['values']['count'] == 0) {
 
                         # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
-                        $temp['montagem']['sql'] .= '\''.$post['values'][$temp['montagem']['values']['count']].'\'';
+                        $temp['montagem']['sql'] .= '\''.addslashes($post['values'][$temp['montagem']['values']['count']]).'\'';
                     }
 
                     # valida se o loop não está no inicio
                     if ($temp['montagem']['values']['count'] > 0) {
 
                         # adiciona em @temp>montagem>sql o fechamento do parametro para os campos da tabela
-                        $temp['montagem']['sql'] .= ', \''.$post['values'][$temp['montagem']['values']['count']].'\'';
+                        $temp['montagem']['sql'] .= ', \''.addslashes($post['values'][$temp['montagem']['values']['count']]).'\'';
                     }
 
                     # adiciona +1 em $temp>montagem>values>count
@@ -1312,7 +1321,7 @@ function update($post, $print){
                 $temp['montagem']['sql'] .= '`'. $temp['montagem']['set']['key'].'`';
 
                 # adiciona em @temp>montagem>sql o valor de @post>set para coluna de "SELECT LIKE", para valores relativos
-                $temp['montagem']['sql'] .= ' = \''.$temp['montagem']['set']['val'].'\'';
+                $temp['montagem']['sql'] .= ' = \''.addslashes($temp['montagem']['set']['val']).'\'';
 
                 # adiciona +1 no contador de @temp>montagem>select>count
                 $temp['montagem']['set']['count']++;
@@ -1358,14 +1367,14 @@ function update($post, $print){
                 if ($post['regra']['relative'] == true) {
 
                     # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores relativos
-                    $temp['montagem']['sql'] .= ' LIKE \'%'.$temp['montagem']['where']['val'].'%\' ';
+                    $temp['montagem']['sql'] .= ' LIKE \'%'.addslashes($temp['montagem']['where']['val']).'%\' ';
                 }
 
                 # valida se o @post>regra>relative é falso pra valor relativo, e verdadeiro para especifico
                 if ($post['regra']['relative'] == false) {
 
                     # adiciona em @temp>montagem>sql o valor de @post>where para coluna de "SELECT LIKE", para valores especificos
-                    $temp['montagem']['sql'] .= ' LIKE \''.$temp['montagem']['where']['val'].'\' ';
+                    $temp['montagem']['sql'] .= ' LIKE \''.addslashes($temp['montagem']['where']['val']).'\' ';
                 }
 
                 # adiciona +1 no contador de @temp>montagem>select>count

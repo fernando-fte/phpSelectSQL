@@ -321,9 +321,6 @@ $temp['delete']['table'] = $post['table'];
 # adiciona em @temp>delete>where os campos de redundanca de seleção
 $temp['delete']['where'] = $post['select'];
 
-# adiciona em @temp>delete>values os campos a serem atualizados
-$temp['delete']['values'] = $post['delete'];
-
 # adiciona em @temp>delete>regra>limit o valor de limite de respostas como "2"
 $temp['delete']['regra']['limit'] = 0;
 

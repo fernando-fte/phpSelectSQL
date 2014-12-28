@@ -60,6 +60,12 @@ $temp['select']['regra']['order']['to'] = 'index';
 # adiciona em @temp>select>regra>order>by o valor de ordenação "ASC|DESC"
 $temp['select']['regra']['order']['by'] = 'ASC';
 
+# adiciona em @temp>select>regra>order>to o campo de definição para ordenação da tabela MySQL
+// $temp['select']['regra']['order'][0]['to'] = 'index';
+
+# adiciona em @temp>select>regra>order>by o valor de ordenação "ASC|DESC"
+// $temp['select']['regra']['order'][0]['by'] = 'ASC';
+
 # adiciona em @temp>select>regra>limit o valor de limite de respostas como "2"
 $temp['select']['regra']['limit'] = '2';
 

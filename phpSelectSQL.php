@@ -593,11 +593,37 @@ function select($post, $print){
             # valida se @post>regra>order não é falso
             if ($post['regra']['order'] != false) {
 
-                # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a coluna
-                $temp['montagem']['sql'] .= 'ORDER BY `'.$post['regra']['order']['to'].'` ';
+                # adiciona em @temp>montagem>regra>count o valor da contagem de @post>regra>order em length
+                $temp['montagem']['regra']['count'] = 0;
 
-                # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a ordem
-                $temp['montagem']['sql'] .= $post['regra']['order']['by'].' ';
+                while ($temp['montagem']['regra']['count'] < $post['regra']['order']['length']) {
+
+                    # Inicia montagem quando for em zero
+                    if ($temp['montagem']['regra']['count'] == 0 ) {
+
+                        # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a coluna
+                        $temp['montagem']['sql'] .= 'ORDER BY `'.$post['regra']['order'][$temp['montagem']['regra']['count']]['to'].'` ';
+
+                        # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a ordem
+                        $temp['montagem']['sql'] .= $post['regra']['order'][$temp['montagem']['regra']['count']]['by'].' ';
+                    }
+
+                    # continua montagem quando form maior que zero
+                    if ($temp['montagem']['regra']['count'] > 0 ) {
+
+                        # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a coluna
+                        $temp['montagem']['sql'] .= ', `'.$post['regra']['order'][$temp['montagem']['regra']['count']]['to'].'` ';
+
+                        # adiciona em @temp>montagem>sql o o parametro para "ORDER BY" quanto a ordem
+                        $temp['montagem']['sql'] .= $post['regra']['order'][$temp['montagem']['regra']['count']]['by'].' ';
+                    }
+
+                    # adiciona +1 no contador de @temp>montagem>regra>count
+                    $temp['montagem']['regra']['count']++;
+                }
+
+                # apaga @temp>montagem>regra
+                unset($temp['montagem']['regra']);
             }
 
             # # tratamento para "ORDER"
@@ -2000,8 +2026,104 @@ function trata_query($post, $print){
                 # valida se existe "order" em @post>regra, que deve conter as regras de ordenação
                 if (array_key_exists('order', $post['regra'])) {
 
-                    # valida se não existe "to" em @post>regra>order, que identifica um campo para setar a ordem ede exibição
-                    if (!array_key_exists('to', $post['regra']['order'])) {
+                    // @post>regra>order -> to && by
+                    // @post>regra>order -> to && by
+
+                    # valida se "order" em @post>regra é um array
+                    if (is_array($post['regra']['order'])) {
+
+                        if (array_key_exists('0', $post['regra']['order'])) {
+
+                            # inicia lop para capturar todos os valores de @post>regra>order
+                            for ($i=0; $i < count($post['regra']['order']); $i++) { 
+
+                                # valida se não existe "to" em @post>regra>order>[@~i], que identifica um campo para setar a ordem ede exibição
+                                if (!array_key_exists('to', $post['regra']['order'][$i])) {
+
+                                    # define @post>regra>order como false
+                                    $post['regra']['order'] = false;
+
+
+                                    # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                                    $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para exibição';
+
+                                    # adiciona +1 em $return>error>length
+                                    $return['warning']['length']++;
+                                }
+
+                                # valida se não existe "by" em @post>regra>order>[@~i], define se a ordem é acendente ou descendente
+                                if (!array_key_exists('by', $post['regra']['order'][$i])) {
+
+                                    # define @post>regra>order como false
+                                    $post['regra']['order'] = false;
+
+
+                                    # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                                    $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para seleção';
+
+                                    # adiciona +1 em $return>error>length
+                                    $return['warning']['length']++;
+                                }
+                            }
+
+                            # declara a quantidade de todos os valores de @post>regra>order
+                            $post['regra']['order']['length'] = $i;
+
+                            # apaga @i
+                            unset($i);
+                        }
+
+                        if (!array_key_exists('0', $post['regra']['order'])) {
+
+                            # valida se não existe "to" em @post>regra>order, que identifica um campo para setar a ordem ede exibição
+                            if (!array_key_exists('to', $post['regra']['order'])) {
+
+                                # define @post>regra>order como false
+                                $post['regra']['order'] = false;
+
+
+                                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                                $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para exibição';
+
+                                # adiciona +1 em $return>error>length
+                                $return['warning']['length']++;
+                            }
+
+                            # valida se não existe "by" em @post>regra>order, define se a ordem é acendente ou descendente
+                            if (!array_key_exists('by', $post['regra']['order'])) {
+
+                                # define @post>regra>order como false
+                                $post['regra']['order'] = false;
+
+
+                                # adiciona em @return>warning>[@~length]>type o um relato do que houve
+                                $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para seleção';
+
+                                # adiciona +1 em $return>error>length
+                                $return['warning']['length']++;
+                            }
+
+                            # trata os valores de @post>regra>order caso não tenha havido nem um erro
+                            if ($post['regra']['order'] != false) {
+
+                                # adiciona em @temp>move>0 os arquivos de @post>regra>order
+                                $temp['move'][0] = $post['regra']['order'];
+
+                                # substitui os valores de @post>regra>order por @temp>move
+                                $post['regra']['order'] = $temp['move'];
+
+                                # declara a quantidade de todos os valores de @post>regra>order
+                                $post['regra']['order']['length'] = 1;
+
+                                # apaga @temp
+                                unset($temp);
+                            }
+                        }
+                    }
+
+
+                    # valida se "order" em @post>regra mão é um array
+                    if (!is_array($post['regra']['order'])) {
 
                         # define @post>regra>order como false
                         $post['regra']['order'] = false;
@@ -2009,20 +2131,6 @@ function trata_query($post, $print){
 
                         # adiciona em @return>warning>[@~length]>type o um relato do que houve
                         $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para exibição';
-
-                        # adiciona +1 em $return>error>length
-                        $return['warning']['length']++;
-                    }
-
-                    # valida se não existe "by" em @post>regra>order, define se a ordem é acendente ou descendente
-                    if (!array_key_exists('by', $post['regra']['order'])) {
-
-                        # define @post>regra>order como false
-                        $post['regra']['order'] = false;
-
-
-                        # adiciona em @return>warning>[@~length]>type o um relato do que houve
-                        $return['warning'][$return['warning']['length']]['type'] = 'Não foi encontrado um dos parametros de seleção de ordem, assim definindo como sem ordenamento para seleção';
 
                         # adiciona +1 em $return>error>length
                         $return['warning']['length']++;

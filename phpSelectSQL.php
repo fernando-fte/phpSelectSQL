@@ -736,7 +736,7 @@ function select($post, $print){
                 }
 
                 # valida se @return>result>length é igual a 1 ou maior que zero, para mais valores retornados
-                if ($return['result']['length'] > 0) {
+                if ($return['result']['length'] == 0) {
 
                     # adiciona em @return>result>0 o valor de retorno da primeira entrada com a função mysql_fetch_assoc()
                     $return['result']['0'] = mysql_fetch_assoc($temp['select']['result']['result']);
